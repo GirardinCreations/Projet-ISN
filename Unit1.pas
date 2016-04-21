@@ -1,11 +1,12 @@
 unit Unit1;
 
 interface
-
 uses
 	Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, ExtCtrls, StdCtrls;
 
+const
+	UM_DESTROYBLUES = WM_APP + 1;
 type
 	TForm1 = class(TForm)
 		Fond: TImage;
@@ -46,15 +47,16 @@ type
 		procedure SelectionnableClick(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
 	private
-		{ Déclarations privées }
+		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
 	public
 		{ Déclarations publiques }
 	end;
 
 var
-	Form1: TForm1;	
+	Form1: TForm1;
 	poss: Array [1..64] of TPoint;
 	positions: Array [1..64] of integer;
+	Blues: Array [1..64] of TImage;
 	nbBlue: integer;
 	whitePlays: boolean;
 	Last: TImage;
@@ -176,17 +178,27 @@ Begin
 		Parent := Form1; // L'attache à la fenêtre de Jeu
 		Left := X; // Le positionne en X
 		Top := Y; // Le positionne en Y
-		Picture.LoadFromFile('Blue.bmp'); // Affecte une Image
+		Picture.LoadFromFile ('Blue.bmp'); // Affecte une Image
 		Height := 48; // Affecte une grandeur en Y
 		Width := 48; // Affecte une grandeur en X
-		Transparent:= false; // Est Transparent
+		Transparent := false; // Est Transparent
 		Stretch := true;
 		OnClick := Click; // Affecte une procedure pour le Click
 		Tag := 9;
 		inc (nbBlue);
 		Name := 'Blue' + inttostr (nbBlue);
 	End;
+	Blues[nbBlue] := objet;
 End;
+
+procedure TForm1.DestroyHandler (var Msg: TMessage);
+begin
+	while nbBlue <> 0 do
+	begin
+		Blues[nbBlue].Free;
+		dec (nbBlue);
+	end;
+end;
 
 procedure TForm1.SelectionnableClick(Sender: TObject);
 var
@@ -196,12 +208,8 @@ begin
 	
 	last.Top := sen.Top;
 	last.Left := sen.Left;
-		
-	while nbBlue <> 0 do
-	begin
-		FindComponent('Blue' + inttostr (nbBlue)).Free;
-		dec (nbBlue);
-	end;
+
+	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 end;
 
 procedure TForm1.ImageClick(Sender: TObject);
@@ -232,11 +240,7 @@ begin
 	Label1.Caption := txt;
 	txt := '';
 	
-	while nbBlue <> 0 do
-	begin
-		FindComponent('Blue' + inttostr (nbBlue)).Free;
-		dec (nbBlue);
-	end;
+	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 
 	last := sen;
 	lis := GetPoss (sen.Tag, sen.Left, sen.Top);
@@ -251,6 +255,9 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
 	i: integer;
 begin
+	for i := 1 to 64 do
+		Blues[i] := nil;
+	
 	positions[1] := 21;
 	positions[2] := 22;
 	positions[3] := 23;
