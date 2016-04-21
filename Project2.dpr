@@ -8,6 +8,7 @@ uses
 
 begin
   Application.Initialize;
+  Application.Title := 'Chess Engine';
   Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
