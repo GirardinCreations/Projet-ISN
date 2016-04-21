@@ -182,15 +182,26 @@ Begin
 		Transparent:= false; // Est Transparent
 		Stretch := true;
 		OnClick := Click; // Affecte une procedure pour le Click
-		Tag := 9; // Donne un Tag correspondant à la couleur du joueur 
+		Tag := 9;
 		inc (nbBlue);
 		Name := 'Blue' + inttostr (nbBlue);
 	End;
 End;
 
 procedure TForm1.SelectionnableClick(Sender: TObject);
+var
+	sen: TImage;
 begin
-		{comment to avoid deletion}
+	sen := (Sender as TImage);
+	
+	last.Top := sen.Top;
+	last.Left := sen.Left;
+		
+	while nbBlue <> 0 do
+	begin
+		FindComponent('Blue' + inttostr (nbBlue)).Free;
+		dec (nbBlue);
+	end;
 end;
 
 procedure TForm1.ImageClick(Sender: TObject);
@@ -204,6 +215,7 @@ begin
 	sen := (Sender as TImage);
 	case sen.Tag of
 		0 : txt := 'Euh...';
+		9 : txt := 'I''m blue...';
 		11: txt := 'Tour blanche';
 		12: txt := 'Cavalier blanc';
 		13: txt := 'Fou blanc';
@@ -226,6 +238,7 @@ begin
 		dec (nbBlue);
 	end;
 
+	last := sen;
 	lis := GetPoss (sen.Tag, sen.Left, sen.Top);
 	for i := 0 to lis.Count - 1 do
 	begin
