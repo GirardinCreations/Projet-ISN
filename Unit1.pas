@@ -7,6 +7,7 @@ uses
 
 const
 	UM_DESTROYBLUES = WM_APP + 1;
+	UM_EXECUTION = WM_APP + 2;
 type
 	TForm1 = class(TForm)
 		Fond: TImage;
@@ -49,6 +50,7 @@ type
 		function GetPoss (typePion, x, y: integer): TList;
 	private
 		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
+		procedure ExecutionHandler(var Msg: TMessage); message UM_EXECUTION;
 	public
 		{ Déclarations publiques }
 	end;
@@ -270,6 +272,23 @@ begin
 	end;
 end;
 
+procedure TForm1.ExecutionHandler (var Msg: TMessage);
+var
+	i: integer;
+	tmp: TImage;
+begin
+	for i := 1 to 32 do
+	begin
+		tmp := FindComponent ('Image' + inttostr(i)) as TImage;
+		if (tmp <> nil) then
+			if (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
+			begin
+				tmp.Free;
+				break;
+			end;
+	end;
+end;
+
 procedure TForm1.SelectionnableClick(Sender: TObject);
 var
 	sen: TImage;
@@ -284,6 +303,7 @@ begin
 	positions [pos2.X + 8 * (pos2.Y - 1)] := positions [pos.X + 8 * (pos.Y - 1)];
 	positions [pos.X + 8 * (pos.Y - 1)] := 0;
 	
+	SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
 	last.Top := sen.Top - 8;
 	last.Left := sen.Left - 8;
 
