@@ -46,20 +46,24 @@ type
 		procedure ImageClick(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
+		procedure CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
+		function GetPoss (typePion, x, y: integer): TList;
 	private
 		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
 	public
-		{ Déclarations publiques }
+		{ DÃ©clarations publiques }
 	end;
 
 var
 	Form1: TForm1;
 	poss: Array [1..64] of TPoint;
 	positions: Array [1..64] of integer;
+	moved: Array [1..64] of boolean;
 	Blues: Array [1..64] of TImage;
 	nbBlue: integer;
 	whitePlays: boolean;
 	Last: TImage;
+	mask: byte;
 	typePion: integer; // ou enum
 	//Tour:		1
 	//Cavalier:	2
@@ -67,6 +71,7 @@ var
 	//Reine:	4
 	//Roi:		5
 	//Pion:		6
+	//Blue:		9
 	//Blanc:	10
 	//Noir:		20
 
@@ -74,67 +79,105 @@ implementation
 
 {$R *.dfm}
 
-function GetPoss (typePion, x, y: integer): TList;
+function GetPos (point: TPoint): TPoint;
+begin
+	GetPos.X := (point.X - 32) div 64 + 1;
+	GetPos.Y := (point.Y - 32) div 64 + 1;
+end;
+
+procedure TForm1.CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
+var
+	tmp: integer;
+	tmpb: byte;
+	tmpp: TPoint;
+	tmpp2: TPoint;
+begin
+	if (point.X >= 32) and (point.Y >= 32) and
+	   (point.X <= 500) and (point.Y <= 500) then
+	begin
+		tmpb := mask and masque;
+		if tmpb <> 0 then
+		begin
+			tmpp := GetPos (point);
+			tmpp2 := GetPos (base);
+			Label1.Caption := Label1.Caption + #13 + inttostr(tmpp.X) + #32 + inttostr(tmpp.Y);
+			
+			tmp := positions [tmpp.X + 8 * (tmpp.Y - 1)];
+			if tmp = 0 then
+				posss.Add(@point)
+			else
+				if (tmp div 10) <> (positions [tmpp2.X + 8 * (tmpp2.Y - 1)] div 10) then
+				begin
+					posss.Add(@point);
+					mask := mask - masque;
+				end
+				else
+					mask := mask - masque;
+		end;
+	end;
+end;
+
+function TForm1.GetPoss (typePion, x, y: integer): TList;
 var
 		pos: TPoint;
 		posss: TList;
 		i: Integer;
-		tmp: TPoint;
 begin
 		GetPoss := TList.Create;
 		posss := TList.Create;	
 		pos := Point (x, y);
+		mask := 255;
 		case typePion mod 10 of
 				 1: begin
 						for i := 1 to 8 do
 						begin
-							poss [i] := Point (pos.X + 64 * i, pos.Y); posss.Add (@poss [i]);
-							poss [i + 8] := Point (pos.X, pos.Y + 64 * i); posss.Add (@poss [i + 8]);
-							poss [i + 16] := Point (pos.X - 64 * i, pos.Y); posss.Add (@poss [i + 16]);
-							poss [i + 24] := Point (pos.X, pos.Y - 64 * i); posss.Add (@poss [i + 24]);
+							poss [i] := Point (pos.X + 64 * i, pos.Y); CheckPos (poss [i], pos, posss, 1);
+							poss [i + 8] := Point (pos.X, pos.Y + 64 * i); CheckPos (poss [i + 8], pos, posss, 2);
+							poss [i + 16] := Point (pos.X - 64 * i, pos.Y); CheckPos (poss [i + 16], pos, posss, 4);
+							poss [i + 24] := Point (pos.X, pos.Y - 64 * i); CheckPos (poss [i + 24], pos, posss, 8);
 						end;
 					end;
 				 2: begin
-						poss[1] := Point (pos.X + 64, pos.Y + 128); posss.Add (@poss[1]);
-						poss[2] := Point (pos.X + 64, pos.Y - 128); posss.Add (@poss[2]);
-						poss[3] := Point (pos.X + 128, pos.Y + 64); posss.Add (@poss[3]);
-						poss[4] := Point (pos.X + 128, pos.Y - 64); posss.Add (@poss[4]);
-						poss[5] := Point (pos.X - 64, pos.Y + 128); posss.Add (@poss[5]);
-						poss[6] := Point (pos.X - 64, pos.Y - 128); posss.Add (@poss[6]);
-						poss[7] := Point (pos.X - 128, pos.Y + 64); posss.Add (@poss[7]);
-						poss[8] := Point (pos.X - 128, pos.Y - 64); posss.Add (@poss[8]);
+						poss[1] := Point (pos.X + 64, pos.Y + 128); CheckPos (poss [1], pos, posss, 1);
+						poss[2] := Point (pos.X + 64, pos.Y - 128); CheckPos (poss [2], pos, posss, 2);
+						poss[3] := Point (pos.X + 128, pos.Y + 64); CheckPos (poss [3], pos, posss, 4);
+						poss[4] := Point (pos.X + 128, pos.Y - 64); CheckPos (poss [4], pos, posss, 8);
+						poss[5] := Point (pos.X - 64, pos.Y + 128); CheckPos (poss [5], pos, posss, 16);
+						poss[6] := Point (pos.X - 64, pos.Y - 128); CheckPos (poss [6], pos, posss, 32);
+						poss[7] := Point (pos.X - 128, pos.Y + 64); CheckPos (poss [7], pos, posss, 64);
+						poss[8] := Point (pos.X - 128, pos.Y - 64); CheckPos (poss [8], pos, posss, 128);
 					end;
 				 3: begin
 						for i := 1 to 8 do
 						begin
-							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); posss.Add (@poss[i]);
-							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); posss.Add (@poss[i+8]);
-							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); posss.Add (@poss[i+16]);
-							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); posss.Add (@poss[i+24]);
+							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); CheckPos (poss [i], pos, posss, 1);
+							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); CheckPos (poss [i + 8], pos, posss, 2);
+							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 16], pos, posss, 4);
+							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 24], pos, posss, 8);
 						end;
 					end;
 				 4: begin
 						for i := 1 to 8 do
 						begin
-							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); posss.Add (@poss[i]);
-							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); posss.Add (@poss[i+8]);
-							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); posss.Add (@poss[i+16]);
-							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); posss.Add (@poss[i+24]);
-							poss[i+32] := Point (pos.X + 64 * i, pos.Y); posss.Add (@poss[i+32]);
-							poss[i+40] := Point (pos.X, pos.Y + 64 * i); posss.Add (@poss[i+40]);
-							poss[i+48] := Point (pos.X - 64 * i, pos.Y); posss.Add (@poss[i+48]);
-							poss[i+56] := Point (pos.X, pos.Y - 64 * i); posss.Add (@poss[i+56]);
+							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); CheckPos (poss [i], pos, posss, 1);
+							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); CheckPos (poss [i + 8], pos, posss, 2);
+							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 16], pos, posss, 4);
+							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 24], pos, posss, 8);
+							poss[i+32] := Point (pos.X + 64 * i, pos.Y); CheckPos (poss [i + 32], pos, posss, 16);
+							poss[i+40] := Point (pos.X, pos.Y + 64 * i); CheckPos (poss [i + 40], pos, posss, 32);
+							poss[i+48] := Point (pos.X - 64 * i, pos.Y); CheckPos (poss [i + 48], pos, posss, 64);
+							poss[i+56] := Point (pos.X, pos.Y - 64 * i); CheckPos (poss [i + 56], pos, posss, 128);
 						end;
 					end;
 				 5: begin
-						poss[1] := Point (pos.X + 64, pos.Y + 64); posss.Add (@poss[1]);
-						poss[2] := Point (pos.X - 64, pos.Y + 64); posss.Add (@poss[2]);
-						poss[3] := Point (pos.X - 64, pos.Y - 64); posss.Add (@poss[3]);
-						poss[4] := Point (pos.X + 64, pos.Y - 64); posss.Add (@poss[4]);
-						poss[5] := Point (pos.X + 64, pos.Y); posss.Add (@poss[5]);
-						poss[6] := Point (pos.X, pos.Y + 64); posss.Add (@poss[6]);
-						poss[7] := Point (pos.X - 64, pos.Y); posss.Add (@poss[7]);
-						poss[8] := Point (pos.X, pos.Y - 64); posss.Add (@poss[8]);
+						poss[1] := Point (pos.X + 64, pos.Y + 64); CheckPos (poss [1], pos, posss, 1);
+						poss[2] := Point (pos.X - 64, pos.Y + 64); CheckPos (poss [2], pos, posss, 2);
+						poss[3] := Point (pos.X - 64, pos.Y - 64); CheckPos (poss [3], pos, posss, 4);
+						poss[4] := Point (pos.X + 64, pos.Y - 64); CheckPos (poss [4], pos, posss, 8);
+						poss[5] := Point (pos.X + 64, pos.Y); CheckPos (poss [5], pos, posss, 16);
+						poss[6] := Point (pos.X, pos.Y + 64); CheckPos (poss [6], pos, posss, 32);
+						poss[7] := Point (pos.X - 64, pos.Y); CheckPos (poss [7], pos, posss, 64);
+						poss[8] := Point (pos.X, pos.Y - 64); CheckPos (poss [8], pos, posss, 128);
 					end;
 				 6: begin
 						if (typePion div 10) = 1 then
@@ -157,30 +200,23 @@ begin
 		begin
 			if (TPoint (posss[i]^).X >= 32) and (TPoint (posss[i]^).Y >= 32) and
 			   (TPoint (posss[i]^).X <= 500) and (TPoint (posss [i]^).Y <= 500) then
-				{tmp := Point (TPoint (posss[i]^).X, TPoint (posss[i]^).Y);
-				tmp.X := (tmp.X - 32) div 64 + 1;
-				tmp.Y := (tmp.Y - 32) div 8;
-				if positions [tmp.X + tmp.Y] = 0 then
-				Version ultérieure!
-				}
-				
 				GetPoss.Add (posss[i]);
 		end;
 end;
 
-procedure CreationObjet(X, Y: integer; Click : TNotifyEvent); // Création d'objet
+procedure CreationObjet(X, Y: integer; Click : TNotifyEvent); // CrÃ©ation d'objet
 var
 	objet : TImage;
 Begin
 	objet := TImage.Create(Form1);
 	with objet do
 	Begin
-		Parent := Form1; // L'attache à la fenêtre de Jeu
-		Left := X; // Le positionne en X
-		Top := Y; // Le positionne en Y
+		Parent := Form1; // L'attache Ã  la fenÃªtre de Jeu
+		Left := X + 8; // Le positionne en X
+		Top := Y + 8; // Le positionne en Y
 		Picture.LoadFromFile ('Blue.bmp'); // Affecte une Image
-		Height := 48; // Affecte une grandeur en Y
-		Width := 48; // Affecte une grandeur en X
+		Height := 32; // Affecte une grandeur en Y
+		Width := 32; // Affecte une grandeur en X
 		Transparent := false; // Est Transparent
 		Stretch := true;
 		OnClick := Click; // Affecte une procedure pour le Click
@@ -206,8 +242,8 @@ var
 begin
 	sen := (Sender as TImage);
 	
-	last.Top := sen.Top;
-	last.Left := sen.Left;
+	last.Top := sen.Top - 8;
+	last.Left := sen.Left - 8;
 
 	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 end;
@@ -257,6 +293,9 @@ var
 begin
 	for i := 1 to 64 do
 		Blues[i] := nil;
+	
+	for i := 1 to 64 do
+		moved[i] := false;
 	
 	positions[1] := 21;
 	positions[2] := 22;
