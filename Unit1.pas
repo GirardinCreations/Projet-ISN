@@ -42,7 +42,6 @@ type
 		Image30: TImage;
 		Image31: TImage;
 		Image32: TImage;
-		Label1: TLabel;
 		procedure ImageClick(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
@@ -81,8 +80,8 @@ implementation
 
 function GetPos (point: TPoint): TPoint;
 begin
-	GetPos.X := (point.X - 32) div 64 + 1;
-	GetPos.Y := (point.Y - 32) div 64 + 1;
+	GetPos.X := (point.X + 32) div 64;
+	GetPos.Y := (point.Y + 32) div 64;
 end;
 
 procedure TForm1.CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
@@ -100,28 +99,25 @@ begin
 		begin
 			tmpp := GetPos (point);
 			tmpp2 := GetPos (base);
-			Label1.Caption := Label1.Caption + #13 + inttostr(tmpp.X) + #32 + inttostr(tmpp.Y);
 			
 			tmp := positions [tmpp.X + 8 * (tmpp.Y - 1)];
 			if tmp = 0 then
 				posss.Add(@point)
 			else
+			begin
 				if (tmp div 10) <> (positions [tmpp2.X + 8 * (tmpp2.Y - 1)] div 10) then
-				begin
 					posss.Add(@point);
-					mask := mask - masque;
-				end
-				else
-					mask := mask - masque;
+				mask := mask - masque;
+			end;
 		end;
 	end;
 end;
 
 function TForm1.GetPoss (typePion, x, y: integer): TList;
 var
-		pos: TPoint;
-		posss: TList;
-		i: Integer;
+	pos, tmp: TPoint;
+	posss: TList;
+	i, tmp2: Integer;
 begin
 		GetPoss := TList.Create;
 		posss := TList.Create;	
@@ -182,17 +178,55 @@ begin
 				 6: begin
 						if (typePion div 10) = 1 then
 						begin
-							 poss[1] := Point (pos.X + 64, pos.Y - 64); posss.Add (@poss[1]);
-							 poss[2] := Point (pos.X - 64, pos.Y - 64); posss.Add (@poss[2]);
-							 poss[3] := Point (pos.X, pos.Y - 64); posss.Add (@poss[3]);
-							 poss[4] := Point (pos.X, pos.Y - 128); posss.Add (@poss[4]);
+							if positions [GetPos (Point (pos.X, pos.Y - 64)).X + 8 * (GetPos (Point (pos.X, pos.Y - 64)).Y - 1)] = 0 then
+							begin
+								poss[1] := Point (pos.X, pos.Y - 64); CheckPos (poss [1], pos, posss, 1);
+								if (positions [GetPos (Point (pos.X, pos.Y - 128)).X + 8 * (GetPos (Point (pos.X, pos.Y - 128)).Y - 1)] = 0)
+									and not (moved [GetPos (pos).X + 8 * (GetPos (pos).Y - 1)]) then
+									begin
+										poss[2] := Point (pos.X, pos.Y - 128); CheckPos (poss [2], pos, posss, 1);
+									end;
+							end;
+							
+							tmp := GetPos (Point (pos.X - 64, pos.Y - 64));
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
+								begin
+									poss[3] := Point (pos.X - 64, pos.Y - 64); CheckPos (poss [3], pos, posss, 2);
+								end;
+							
+							tmp := GetPos (Point (pos.X + 64, pos.Y - 64));
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
+								begin
+									poss[4] := Point (pos.X + 64, pos.Y - 64); CheckPos (poss [4], pos, posss, 4);
+								end;
 						end
 						else
 						begin
-							 poss[1] := Point (pos.X + 64, pos.Y + 64); posss.Add (@poss[1]);
-							 poss[2] := Point (pos.X - 64, pos.Y + 64); posss.Add (@poss[2]);
-							 poss[3] := Point (pos.X, pos.Y + 64); posss.Add (@poss[3]);
-							 poss[4] := Point (pos.X, pos.Y + 128); posss.Add (@poss[4]);
+							if positions [GetPos (Point (pos.X, pos.Y + 64)).X + 8 * (GetPos (Point (pos.X, pos.Y + 64)).Y - 1)] = 0 then
+							begin
+								poss[1] := Point (pos.X, pos.Y + 64); CheckPos (poss [1], pos, posss, 1);
+								if (positions [GetPos (Point (pos.X, pos.Y + 128)).X + 8 * (GetPos (Point (pos.X, pos.Y + 128)).Y - 1)] = 0)
+									and not (moved [GetPos (pos).X + 8 * (GetPos (pos).Y - 1)]) then
+									begin
+										poss[2] := Point (pos.X, pos.Y + 128); CheckPos (poss [2], pos, posss, 1);
+									end;
+							end;
+							
+							tmp := GetPos (Point (pos.X - 64, pos.Y + 64));
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
+								begin
+									poss[3] := Point (pos.X - 64, pos.Y + 64); CheckPos (poss [3], pos, posss, 2);
+								end;
+							
+							tmp := GetPos (Point (pos.X + 64, pos.Y + 64));
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
+								begin
+									poss[4] := Point (pos.X + 64, pos.Y + 64); CheckPos (poss [4], pos, posss, 4);
+								end;
 						end;
 					end;
 		end;
@@ -245,6 +279,8 @@ begin
 	pos := GetPos (Point (last.Left, last.Top));
 	pos2 := GetPos (Point (sen.Left, sen.Top));
 	
+	moved [pos.X + 8 * (pos.Y - 1)] := true;
+	moved [pos2.X + 8 * (pos2.Y - 1)] := true;
 	positions [pos2.X + 8 * (pos2.Y - 1)] := positions [pos.X + 8 * (pos.Y - 1)];
 	positions [pos.X + 8 * (pos.Y - 1)] := 0;
 	
@@ -257,32 +293,12 @@ end;
 procedure TForm1.ImageClick(Sender: TObject);
 var
 	i : Integer;
-	txt: String;
 	pos: TPoint;
 	sen: TImage;
 	lis: TList;
 begin
-	sen := (Sender as TImage);
-	case sen.Tag of
-		0 : txt := 'Euh...';
-		9 : txt := 'I''m blue...';
-		11: txt := 'Tour blanche';
-		12: txt := 'Cavalier blanc';
-		13: txt := 'Fou blanc';
-		14: txt := 'Reine blanche';
-		15: txt := 'Roi blanc';
-		16: txt := 'Pion blanc';
-		21: txt := 'Tour noire';
-		22: txt := 'Cavalier noir';
-		23: txt := 'Fou noir';
-		24: txt := 'Reine noire';
-		25: txt := 'Roi noir';
-		26: txt := 'Pion noir';
-	end;
-	Label1.Caption := txt;
-	txt := '';
-	
 	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+	sen := (Sender as TImage);
 
 	last := sen;
 	lis := GetPoss (sen.Tag, sen.Left, sen.Top);

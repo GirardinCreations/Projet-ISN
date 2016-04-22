@@ -7358,11 +7358,4 @@ object Form1: TForm1
     Stretch = True
     OnClick = ImageClick
   end
-  object Label1: TLabel
-    Left = 584
-    Top = 48
-    Width = 32
-    Height = 13
-    Caption = 'Label1'
-  end
 end
