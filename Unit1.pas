@@ -239,8 +239,14 @@ end;
 procedure TForm1.SelectionnableClick(Sender: TObject);
 var
 	sen: TImage;
+	pos, pos2: TPoint;
 begin
 	sen := (Sender as TImage);
+	pos := GetPos (Point (last.Left, last.Top));
+	pos2 := GetPos (Point (sen.Left, sen.Top));
+	
+	positions [pos2.X + 8 * (pos2.Y - 1)] := positions [pos.X + 8 * (pos.Y - 1)];
+	positions [pos.X + 8 * (pos.Y - 1)] := 0;
 	
 	last.Top := sen.Top - 8;
 	last.Left := sen.Left - 8;
@@ -296,6 +302,8 @@ begin
 	
 	for i := 1 to 64 do
 		moved[i] := false;
+	for i := 17 to 48 do
+		moved[i] := true;
 	
 	positions[1] := 21;
 	positions[2] := 22;
