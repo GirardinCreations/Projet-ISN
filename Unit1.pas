@@ -45,20 +45,26 @@ type
 		Image31: TImage;
 		Image32: TImage;
 		
+		ChessBlack: TImage;
+		ChessWhite: TImage;
+		
 		PictureBlue: TImage;
 		PictureRed: TImage;
 		PictureWhiteQueen: TImage;
 		PictureBlackQueen: TImage;
-		ChessBlack: TImage;
-		ChessWhite: TImage;
 		PictureChess: TImage;
 		PictureChessMat: TImage;
 		PicturePat: TImage;
 		PictureWhiteBishop: TImage;
 		PictureBlackBishop: TImage;
+		PictureWhiteKnight: TImage;
+		PictureBlackKnight: TImage;
+		PictureWhiteRook: TImage;
+		PictureBlackRook: TImage;
 		
 		procedure CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false);
 		procedure ImageClick(Sender: TObject);
+		procedure Image2Click(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
 		procedure CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
@@ -78,7 +84,7 @@ var
 	moved: Array [1..64] of boolean;
 	Blues: Array [1..64] of TImage;
 	nbBlue: integer;
-	whitePlays: boolean;
+	whitePlays, pictureSelect: boolean;
 	Last: TImage;
 	mask: byte;
 	PictureBlue, PictureRed, PictureWhiteQueen, PictureBlackQueen: TImage;
@@ -165,7 +171,9 @@ var
 	posss: TList;
 	i: Integer;
 begin
-		GetPoss := TList.Create;
+	GetPoss := TList.Create;
+	if not pictureSelect then
+	begin
 		posss := TList.Create;	
 		pos := Point (x, y);
 		mask := 255;
@@ -282,6 +290,7 @@ begin
 			   (TPoint (posss[i]^).X <= 500) and (TPoint (posss [i]^).Y <= 500) then
 				GetPoss.Add (posss[i]);
 		end;
+	end;
 end;
 
 procedure TForm1.DestroyHandler (var Msg: TMessage);
@@ -345,6 +354,25 @@ begin
 	last.Top := sen.Top - 8;
 	last.Left := sen.Left - 8;
 	
+	if (last.Tag mod 10 = 6) and ((last.Top = 32) or (last.Top = 480)) then
+	begin
+		pictureSelect := true;
+		if last.Tag div 10 = 1 then
+		begin
+			PictureWhiteBishop.Visible := true;
+			PictureWhiteRook.Visible := true;
+			PictureWhiteQueen.Visible := true;
+			PictureWhiteKnight.Visible := true;
+		end
+		else
+		begin
+			PictureBlackBishop.Visible := true;
+			PictureBlackRook.Visible := true;
+			PictureBlackQueen.Visible := true;
+			PictureBlackKnight.Visible := true;
+		end;
+	end;
+	
 	whitePlays := not whitePlays;
 
 	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
@@ -370,6 +398,26 @@ begin
 			CreationObjet (pos.X, pos.Y, SelectionnableClick);
 		end;
 	end;
+end;
+
+procedure TForm1.Image2Click(Sender: TObject);
+var
+	sen: TImage;
+begin
+	sen := (Sender as TImage);
+	last.Tag := sen.Tag;
+	last.Picture.Assign (sen.Picture);
+	
+	PictureBlackBishop.Visible := false;
+	PictureBlackRook.Visible := false;
+	PictureBlackQueen.Visible := false;
+	PictureBlackKnight.Visible := false;
+	PictureWhiteBishop.Visible := false;
+	PictureWhiteRook.Visible := false;
+	PictureWhiteQueen.Visible := false;
+	PictureWhiteKnight.Visible := false;
+	
+	pictureSelect := false;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -413,6 +461,7 @@ begin
 	PictureBlackQueen := FindComponent ('PictureBlackQueen') as TImage;
 	
 	whitePlays := true;
+	pictureSelect := false;
 end;
 
 end.
