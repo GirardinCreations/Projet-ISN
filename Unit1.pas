@@ -95,7 +95,6 @@ end;
 procedure TForm1.CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false);
 var
 	objet : TImage;
-	pic: TImage;
 Begin
 	objet := TImage.Create(Form1);
 	with objet do
@@ -153,7 +152,7 @@ function TForm1.GetPoss (typePion, x, y: integer): TList;
 var
 	pos, tmp: TPoint;
 	posss: TList;
-	i, tmp2: Integer;
+	i: Integer;
 begin
 		GetPoss := TList.Create;
 		posss := TList.Create;	
@@ -317,6 +316,8 @@ begin
 	SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
 	last.Top := sen.Top - 8;
 	last.Left := sen.Left - 8;
+	
+	whitePlays := not whitePlays;
 
 	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 end;
@@ -328,15 +329,18 @@ var
 	sen: TImage;
 	lis: TList;
 begin
-	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 	sen := (Sender as TImage);
-
-	last := sen;
-	lis := GetPoss (sen.Tag, sen.Left, sen.Top);
-	for i := 0 to lis.Count - 1 do
+	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+	if (sen.Tag div 10 = 2) xor (whitePlays) then
 	begin
-		pos := TPoint (lis[i]^);
-		CreationObjet (pos.X, pos.Y, SelectionnableClick);
+
+		last := sen;
+		lis := GetPoss (sen.Tag, sen.Left, sen.Top);
+		for i := 0 to lis.Count - 1 do
+		begin
+			pos := TPoint (lis[i]^);
+			CreationObjet (pos.X, pos.Y, SelectionnableClick);
+		end;
 	end;
 end;
 
@@ -379,6 +383,8 @@ begin
 	PictureRed := FindComponent ('PictureRed') as TImage;
 	PictureWhiteQueen := FindComponent ('PictureWhiteQueen') as TImage;
 	PictureBlackQueen := FindComponent ('PictureBlackQueen') as TImage;
+	
+	whitePlays := true;
 end;
 
 end.
