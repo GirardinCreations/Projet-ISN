@@ -43,6 +43,11 @@ type
 		Image30: TImage;
 		Image31: TImage;
 		Image32: TImage;
+		PictureBlue: TImage;
+		PictureRed: TImage;
+		PictureWhiteQueen: TImage;
+		PictureBlackQueen: TImage;
+		procedure CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false);
 		procedure ImageClick(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
@@ -65,6 +70,7 @@ var
 	whitePlays: boolean;
 	Last: TImage;
 	mask: byte;
+	PictureBlue, PictureRed, PictureWhiteQueen, PictureBlackQueen: TImage;
 	typePion: integer; // ou enum
 	//Tour:		1
 	//Cavalier:	2
@@ -85,6 +91,34 @@ begin
 	GetPos.X := (point.X + 32) div 64;
 	GetPos.Y := (point.Y + 32) div 64;
 end;
+
+procedure TForm1.CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false);
+var
+	objet : TImage;
+	pic: TImage;
+Begin
+	objet := TImage.Create(Form1);
+	with objet do
+	Begin
+		Parent := Form1; // L'attache à la fenêtre de Jeu
+		if red then
+			Picture.Assign (PictureRed.Picture)
+		else
+			Picture.Assign (PictureBlue.Picture); // Affecte une Image
+		Left := X + 8; // Le positionne en X
+		Top := Y + 8; // Le positionne en Y
+		Height := 32; // Affecte une grandeur en Y
+		Width := 32; // Affecte une grandeur en X
+		Transparent := false; // Est Transparent
+		Stretch := true;
+		Visible := true;
+		OnClick := Click; // Affecte une procedure pour le Click
+		Tag := 9;
+		inc (nbBlue);
+		Name := 'Blue' + inttostr (nbBlue);
+	End;
+	Blues[nbBlue] := objet;
+End;
 
 procedure TForm1.CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
 var
@@ -108,7 +142,7 @@ begin
 			else
 			begin
 				if (tmp div 10) <> (positions [tmpp2.X + 8 * (tmpp2.Y - 1)] div 10) then
-					posss.Add(@point);
+					CreationObjet (point.X, point.Y, SelectionnableClick, true);
 				mask := mask - masque;
 			end;
 		end;
@@ -191,17 +225,17 @@ begin
 							end;
 							
 							tmp := GetPos (Point (pos.X - 64, pos.Y - 64));
-							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[3] := Point (pos.X - 64, pos.Y - 64); CheckPos (poss [3], pos, posss, 2);
+									poss[3] := Point (pos.X - 64, pos.Y - 64); CreationObjet (pos.X - 64, pos.Y - 64, SelectionnableClick, true);
 								end;
 							
 							tmp := GetPos (Point (pos.X + 64, pos.Y - 64));
-							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[4] := Point (pos.X + 64, pos.Y - 64); CheckPos (poss [4], pos, posss, 4);
+									poss[4] := Point (pos.X + 64, pos.Y - 64); CreationObjet (pos.X + 64, pos.Y - 64, SelectionnableClick, true);
 								end;
 						end
 						else
@@ -217,17 +251,17 @@ begin
 							end;
 							
 							tmp := GetPos (Point (pos.X - 64, pos.Y + 64));
-							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[3] := Point (pos.X - 64, pos.Y + 64); CheckPos (poss [3], pos, posss, 2);
+									poss[3] := Point (pos.X - 64, pos.Y + 64); CreationObjet (pos.X - 64, pos.Y + 64, SelectionnableClick, true);
 								end;
 							
 							tmp := GetPos (Point (pos.X + 64, pos.Y + 64));
-							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (positions [pos.X + 8 * (pos.Y - 1)] div 10))
+							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[4] := Point (pos.X + 64, pos.Y + 64); CheckPos (poss [4], pos, posss, 4);
+									poss[4] := Point (pos.X + 64, pos.Y + 64); CreationObjet (pos.X + 64, pos.Y + 64, SelectionnableClick, true);
 								end;
 						end;
 					end;
@@ -239,29 +273,6 @@ begin
 				GetPoss.Add (posss[i]);
 		end;
 end;
-
-procedure CreationObjet(X, Y: integer; Click : TNotifyEvent); // Création d'objet
-var
-	objet : TImage;
-Begin
-	objet := TImage.Create(Form1);
-	with objet do
-	Begin
-		Parent := Form1; // L'attache à la fenêtre de Jeu
-		Left := X + 8; // Le positionne en X
-		Top := Y + 8; // Le positionne en Y
-		Picture.LoadFromFile ('Blue.bmp'); // Affecte une Image
-		Height := 32; // Affecte une grandeur en Y
-		Width := 32; // Affecte une grandeur en X
-		Transparent := false; // Est Transparent
-		Stretch := true;
-		OnClick := Click; // Affecte une procedure pour le Click
-		Tag := 9;
-		inc (nbBlue);
-		Name := 'Blue' + inttostr (nbBlue);
-	End;
-	Blues[nbBlue] := objet;
-End;
 
 procedure TForm1.DestroyHandler (var Msg: TMessage);
 begin
@@ -363,6 +374,11 @@ begin
 	positions[62] := 13;
 	positions[63] := 12;
 	positions[64] := 11;
+	
+	PictureBlue := FindComponent ('PictureBlue') as TImage;
+	PictureRed := FindComponent ('PictureRed') as TImage;
+	PictureWhiteQueen := FindComponent ('PictureWhiteQueen') as TImage;
+	PictureBlackQueen := FindComponent ('PictureBlackQueen') as TImage;
 end;
 
 end.
