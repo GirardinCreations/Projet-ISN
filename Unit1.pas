@@ -8,6 +8,7 @@ uses
 const
 	UM_DESTROYBLUES = WM_APP + 1;
 	UM_EXECUTION = WM_APP + 2;
+	UM_CHESS = WM_APP + 3;
 type
 	TForm1 = class(TForm)
 		Fond: TImage;
@@ -43,10 +44,19 @@ type
 		Image30: TImage;
 		Image31: TImage;
 		Image32: TImage;
+		
 		PictureBlue: TImage;
 		PictureRed: TImage;
 		PictureWhiteQueen: TImage;
 		PictureBlackQueen: TImage;
+		ChessBlack: TImage;
+		ChessWhite: TImage;
+		PictureChess: TImage;
+		PictureChessMat: TImage;
+		PicturePat: TImage;
+		PictureWhiteBishop: TImage;
+		PictureBlackBishop: TImage;
+		
 		procedure CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false);
 		procedure ImageClick(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
@@ -56,6 +66,7 @@ type
 	private
 		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
 		procedure ExecutionHandler(var Msg: TMessage); message UM_EXECUTION;
+		procedure ChessHandler(var Msg: TMessage); message UM_CHESS;
 	public
 		{ Déclarations publiques }
 	end;
@@ -283,6 +294,23 @@ begin
 end;
 
 procedure TForm1.ExecutionHandler (var Msg: TMessage);
+var
+	i: integer;
+	tmp: TImage;
+begin
+	for i := 1 to 32 do
+	begin
+		tmp := FindComponent ('Image' + inttostr(i)) as TImage;
+		if (tmp <> nil) then
+			if (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
+			begin
+				tmp.Free;
+				break;
+			end;
+	end;
+end;
+
+procedure TForm1.ChessHandler (var Msg: TMessage);
 var
 	i: integer;
 	tmp: TImage;
