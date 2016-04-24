@@ -50,6 +50,8 @@ type
 		
 		PictureBlue: TImage;
 		PictureRed: TImage;
+		PictureGreen: TImage;
+		
 		PictureWhiteQueen: TImage;
 		PictureBlackQueen: TImage;
 		PictureChess: TImage;
@@ -62,12 +64,12 @@ type
 		PictureWhiteRook: TImage;
 		PictureBlackRook: TImage;
 		
-		procedure CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false);
+		procedure CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false; green: boolean = false);
 		procedure ImageClick(Sender: TObject);
 		procedure Image2Click(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
-		procedure CheckPos (chessChecker: boolean; var point, base: TPoint; var posss: TList; masque: byte);
+		procedure CheckPos (chessChecker: boolean; var point, base: TPoint; var posss: TList; masque: integer);
 		function GetPoss (typePion, x, y: integer; chessChecker: boolean = false): TList;
 	private
 		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
@@ -96,6 +98,7 @@ var
 	//Reine:	4
 	//Roi:		5
 	//Pion:		6
+	//Green:	8
 	//Blue:		9
 	//Blanc:	10
 	//Noir:		20
@@ -110,7 +113,7 @@ begin
 	GetPos.Y := (point.Y + 32) div 64;
 end;
 
-procedure TForm1.CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false);
+procedure TForm1.CreationObjet(X, Y: integer; Click: TNotifyEvent; red: boolean = false; green: boolean = false);
 var
 	objet : TImage;
 Begin
@@ -120,6 +123,8 @@ Begin
 		Parent := Form1; // L'attache à la fenêtre de Jeu
 		if red then
 			Picture.Assign (PictureRed.Picture)
+		else if green then
+			Picture.Assign (PictureGreen.Picture)
 		else
 			Picture.Assign (PictureBlue.Picture); // Affecte une Image
 		Left := X + 8; // Le positionne en X
@@ -131,39 +136,45 @@ Begin
 		Visible := true;
 		OnClick := Click; // Affecte une procedure pour le Click
 		Tag := 9;
+		if green then Tag := 8;
 		inc (nbBlue);
 		Name := 'Blue' + inttostr (nbBlue);
 	End;
 	Blues[nbBlue] := objet;
 End;
 
-procedure TForm1.CheckPos (chessChecker: boolean; var point, base: TPoint; var posss: TList; masque: byte);
+procedure TForm1.CheckPos (chessChecker: boolean; var point, base: TPoint; var posss: TList; masque: integer);
 var
 	tmp: integer;
 	tmpb: byte;
 	tmpp: TPoint;
 	tmpp2: TPoint;
 begin
-	if (point.X >= 32) and (point.Y >= 32) and
-	   (point.X <= 500) and (point.Y <= 500) then
+	if masque > 1000 then
+		posss.Add (@point)
+	else
 	begin
-		tmpb := mask and masque;
-		if tmpb <> 0 then
+		if (point.X >= 32) and (point.Y >= 32) and
+		   (point.X <= 500) and (point.Y <= 500) then
 		begin
-			tmpp := GetPos (point);
-			tmpp2 := GetPos (base);
-			
-			tmp := positions [tmpp.X + 8 * (tmpp.Y - 1)];
-			if tmp = 0 then
-				posss.Add(@point)
-			else
+			tmpb := mask and masque;
+			if tmpb <> 0 then
 			begin
-				if (tmp div 10) <> (positions [tmpp2.X + 8 * (tmpp2.Y - 1)] div 10) then
-					if chessChecker then
-						posss.Add(@point)
-					else
-						CreationObjet (point.X, point.Y, SelectionnableClick, true);
-				mask := mask - masque;
+				tmpp := GetPos (point);
+				tmpp2 := GetPos (base);
+				
+				tmp := positions [tmpp.X + 8 * (tmpp.Y - 1)];
+				if tmp = 0 then
+					posss.Add(@point)
+				else
+				begin
+					if (tmp div 10) <> (positions [tmpp2.X + 8 * (tmpp2.Y - 1)] div 10) then
+						if chessChecker then
+							posss.Add(@point)
+						else
+							CreationObjet (point.X, point.Y, SelectionnableClick, true);
+					mask := mask - masque;
+				end;
 			end;
 		end;
 	end;
@@ -232,6 +243,44 @@ begin
 						poss[6] := Point (pos.X, pos.Y + 64); CheckPos (chessChecker, poss [6], pos, posss, 32);
 						poss[7] := Point (pos.X - 64, pos.Y); CheckPos (chessChecker, poss [7], pos, posss, 64);
 						poss[8] := Point (pos.X, pos.Y - 64); CheckPos (chessChecker, poss [8], pos, posss, 128);
+						if (typePion div 10) = 1 then
+						begin
+							if (not moved [61]) and (not moved [64]) and (positions [62] = 0) and (positions [63] = 0) then
+							begin
+								poss[9] := Point (pos.X + 128, pos.Y);
+								if chessChecker then
+									CheckPos (chessChecker, poss [9], pos, posss, 1011)
+								else
+									CreationObjet (poss[9].X, poss [9].Y, SelectionnableClick, false, true);
+							end;
+							if (not moved [61]) and (not moved [57]) and (positions [60] = 0) and (positions [59] = 0) and (positions [58] = 0) then
+							begin
+								poss[10] := Point (pos.X - 128, pos.Y);
+								if chessChecker then
+									CheckPos (chessChecker, poss [10], pos, posss, 1012)
+								else
+									CreationObjet (poss[10].X, poss [10].Y, SelectionnableClick, false, true);
+							end;
+						end
+						else
+						begin
+							if (not moved [5]) and (not moved [8]) and (positions [6] = 0) and (positions [7] = 0) then
+							begin
+								poss[9] := Point (pos.X + 128, pos.Y);
+								if chessChecker then
+									CheckPos (chessChecker, poss [9], pos, posss, 2012)
+								else
+									CreationObjet (poss[9].X, poss [9].Y, SelectionnableClick, false, true);
+							end;
+							if (not moved [5]) and (not moved [1]) and (positions [2] = 0) and (positions [3] = 0) and (positions [4] = 0) then
+							begin
+								poss[10] := Point (pos.X - 128, pos.Y);
+								if chessChecker then
+									CheckPos (chessChecker, poss [10], pos, posss, 2012)
+								else
+									CreationObjet (poss[10].X, poss [10].Y, SelectionnableClick, false, true);
+							end;
+						end;
 					end;
 				 6: begin
 						if (typePion div 10) = 1 then
@@ -402,56 +451,142 @@ begin
 	sen := (Sender as TImage);
 	pos := GetPos (Point (last.Left, last.Top));
 	pos2 := GetPos (Point (sen.Left, sen.Top));
-	
-	tmp := positions [pos2.X + 8 * (pos2.Y - 1)];
-	positions [pos2.X + 8 * (pos2.Y - 1)] := positions [pos.X + 8 * (pos.Y - 1)];
-	positions [pos.X + 8 * (pos.Y - 1)] := 0;
-	
 	latest := Point (last.Left, last.Top);
-	last.Top := sen.Top - 8;
-	last.Left := sen.Left - 8;
-	SendMessage (self.Handle, UM_CHESS, 0, 0);
 	
-	if ((WhiteChess) and (Last.Tag div 10 = 1)) or ((BlackChess) and (Last.Tag div 10 = 2)) then
+	if sen.Tag = 8 then
 	begin
-		last.Left := latest.X;
-		last.Top := latest.Y;
-		positions [pos.X + 8 * (pos.Y - 1)] := positions [pos2.X + 8 * (pos2.Y - 1)];
-		positions [pos2.X + 8 * (pos2.Y - 1)] := tmp;
-		PostMessage (self.Handle, UM_CHESS, 0, 0);
+		if (sen.Left = 424) then
+		begin
+			last.Left := last.Left + 64;
+			SendMessage (self.Handle, UM_CHESS, 0, 0);
+			if ((WhiteChess) and (last.Tag div 10 = 1)) or ((BlackChess) and (last.Tag div 10 = 2)) then
+				last.Left := last.Left - 64
+			else
+			begin
+				last.Left := last.Left + 64;
+				SendMessage (self.Handle, UM_CHESS, 0, 0);
+				if ((WhiteChess) and (last.Tag div 10 = 1)) or ((BlackChess) and (last.Tag div 10 = 2)) then
+					last.Left := last.Left - 128
+				else
+				begin
+					if last.Tag div 10 = 1 then
+					begin
+						sen := FindComponent ('Image2') as TImage;
+						tmp := 56;
+					end
+					else
+					begin
+						sen := FindComponent ('Image4') as TImage;
+						tmp := 0;
+					end;
+					
+					sen.Left := sen.Left - 128;
+					positions [7 + tmp] := positions [5 + tmp];
+					positions [6 + tmp] := positions [8 + tmp];
+					positions [8 + tmp] := 0;
+					positions [5 + tmp] := 0;
+					
+					moved [5 + tmp] := true;
+					moved [8 + tmp] := true;
+
+					whitePlays := not whitePlays;
+					PostMessage (self.Handle, UM_CHESS, 0, 0);
+					PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+				end;
+			end;
+		end
+		else
+		begin
+			last.Left := last.Left - 64;
+			SendMessage (self.Handle, UM_CHESS, 0, 0);
+			if ((WhiteChess) and (last.Tag div 10 = 1)) or ((BlackChess) and (last.Tag div 10 = 2)) then
+				last.Left := last.Left + 64
+			else
+			begin
+				last.Left := last.Left - 64;
+				SendMessage (self.Handle, UM_CHESS, 0, 0);
+				if ((WhiteChess) and (last.Tag div 10 = 1)) or ((BlackChess) and (last.Tag div 10 = 2)) then
+					last.Left := last.Left + 128
+				else
+				begin
+					if last.Tag div 10 = 1 then
+					begin
+						sen := FindComponent ('Image1') as TImage;
+						tmp := 56;
+					end
+					else
+					begin
+						sen := FindComponent ('Image3') as TImage;
+						tmp := 0;
+					end;
+					
+					sen.Left := sen.Left + 192;
+					positions [3 + tmp] := positions [5 + tmp];
+					positions [4 + tmp] := positions [1 + tmp];
+					positions [1 + tmp] := 0;
+					positions [5 + tmp] := 0;
+					
+					moved [5 + tmp] := true;
+					moved [1 + tmp] := true;
+
+					whitePlays := not whitePlays;
+					PostMessage (self.Handle, UM_CHESS, 0, 0);
+					PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+				end;
+			end;
+		end
 	end
 	else
 	begin
-		moved [pos.X + 8 * (pos.Y - 1)] := true;
-		moved [pos2.X + 8 * (pos2.Y - 1)] := true;
+		tmp := positions [pos2.X + 8 * (pos2.Y - 1)];
+		positions [pos2.X + 8 * (pos2.Y - 1)] := positions [pos.X + 8 * (pos.Y - 1)];
+		positions [pos.X + 8 * (pos.Y - 1)] := 0;
 		
-		SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
 		last.Top := sen.Top - 8;
 		last.Left := sen.Left - 8;
+		SendMessage (self.Handle, UM_CHESS, 0, 0);
 		
-		if (last.Tag mod 10 = 6) and ((last.Top = 32) or (last.Top = 480)) then
+		if ((WhiteChess) and (Last.Tag div 10 = 1)) or ((BlackChess) and (Last.Tag div 10 = 2)) then
 		begin
-			pictureSelect := true;
-			if last.Tag div 10 = 1 then
+			last.Left := latest.X;
+			last.Top := latest.Y;
+			positions [pos.X + 8 * (pos.Y - 1)] := positions [pos2.X + 8 * (pos2.Y - 1)];
+			positions [pos2.X + 8 * (pos2.Y - 1)] := tmp;
+			PostMessage (self.Handle, UM_CHESS, 0, 0);
+		end
+		else
+		begin
+			moved [pos.X + 8 * (pos.Y - 1)] := true;
+			moved [pos2.X + 8 * (pos2.Y - 1)] := true;
+			
+			SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
+			last.Top := sen.Top - 8;
+			last.Left := sen.Left - 8;
+			
+			if (last.Tag mod 10 = 6) and ((last.Top = 32) or (last.Top = 480)) then
 			begin
-				PictureWhiteBishop.Visible := true;
-				PictureWhiteRook.Visible := true;
-				PictureWhiteQueen.Visible := true;
-				PictureWhiteKnight.Visible := true;
-			end
-			else
-			begin
-				PictureBlackBishop.Visible := true;
-				PictureBlackRook.Visible := true;
-				PictureBlackQueen.Visible := true;
-				PictureBlackKnight.Visible := true;
+				pictureSelect := true;
+				if last.Tag div 10 = 1 then
+				begin
+					PictureWhiteBishop.Visible := true;
+					PictureWhiteRook.Visible := true;
+					PictureWhiteQueen.Visible := true;
+					PictureWhiteKnight.Visible := true;
+				end
+				else
+				begin
+					PictureBlackBishop.Visible := true;
+					PictureBlackRook.Visible := true;
+					PictureBlackQueen.Visible := true;
+					PictureBlackKnight.Visible := true;
+				end;
 			end;
-		end;
-		
-		whitePlays := not whitePlays;
+			
+			whitePlays := not whitePlays;
 
-		PostMessage (self.Handle, UM_CHESS, 0, 0);
-		PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+			PostMessage (self.Handle, UM_CHESS, 0, 0);
+			PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+		end;
 	end;
 end;
 

@@ -7360,7 +7360,7 @@ object Form1: TForm1
   end
   object PictureBlue: TImage
     Left = 680
-    Top = 168
+    Top = 176
     Width = 32
     Height = 32
     Picture.Data = {
@@ -7372,7 +7372,7 @@ object Form1: TForm1
   end
   object PictureRed: TImage
     Left = 680
-    Top = 360
+    Top = 352
     Width = 32
     Height = 32
     Picture.Data = {
@@ -12868,5 +12868,17 @@ object Form1: TForm1
     Stretch = True
     Visible = False
     OnClick = Image2Click
+  end
+  object PictureGreen: TImage
+    Left = 680
+    Top = 264
+    Width = 32
+    Height = 32
+    Picture.Data = {
+      07544269746D61703A000000424D3A0000000000000036000000280000000100
+      0000010000000100180000000000040000000000000000000000000000000000
+      000000FF0000}
+    Stretch = True
+    Visible = False
   end
 end
