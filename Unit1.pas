@@ -630,6 +630,7 @@ begin
 	PictureWhiteKnight.Visible := false;
 	
 	pictureSelect := false;
+	PostMessage (self.Handle, UM_CHESS, 0, 0);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
