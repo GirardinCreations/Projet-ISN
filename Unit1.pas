@@ -87,6 +87,7 @@ var
 	whitePlays, pictureSelect: boolean;
 	Last: TImage;
 	mask: byte;
+	WhiteChess, BlackChess: boolean;
 	PictureBlue, PictureRed, PictureWhiteQueen, PictureBlackQueen: TImage;
 	typePion: integer; // ou enum
 	//Tour:		1
@@ -336,7 +337,7 @@ begin
 	begin
 		tmp := FindComponent ('Image' + inttostr(i)) as TImage;
 		if (tmp <> nil) then
-			if (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
+			if (tmp.Tag <> last.Tag) and (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
 			begin
 				tmp.Free;
 				break;
@@ -350,15 +351,14 @@ var
 	tmp, BKing, WKing: TImage;
 	PBK, PWK, pos: TPoint;
 	lis: TList;
-	White, Black: boolean;
 begin
 	lis := TList.Create;
 	BKing := FindComponent ('Image14') as TImage;
 	WKing := FindComponent ('Image15') as TImage;
 	PBK := Point (BKing.Left, BKing.Top);
 	PWK := Point (WKing.Left, WKing.Top);
-	White := false;
-	Black := false;
+	WhiteChess := false;
+	BlackChess := false;
 	
 	for j := 1 to 32 do
 	begin
@@ -370,21 +370,21 @@ begin
 			begin
 				pos := TPoint (lis[i]^);
 				if (pos.X = PBK.X) and (pos.Y = PBK.Y) and (tmp.Tag div 10 = 1) then
-					Black := true;
+					BlackChess := true;
 				if (pos.X = PWK.X) and (pos.Y = PWK.Y) and (tmp.Tag div 10 = 2) then
-					White := true;
+					WhiteChess := true;
 			end;
 		end;
 	end;
 	
-	if White then
+	if WhiteChess then
 	begin
 		ChessWhite.Picture.Assign (PictureChess.Picture);
 		ChessWhite.Visible := true;
 	end
 	else
 		ChessWhite.Visible := false;
-	if Black then
+	if BlackChess then
 	begin
 		ChessBlack.Picture.Assign (PictureChess.Picture);
 		ChessBlack.Visible := true;
@@ -396,44 +396,63 @@ end;
 procedure TForm1.SelectionnableClick(Sender: TObject);
 var
 	sen: TImage;
-	pos, pos2: TPoint;
+	pos, pos2, latest: TPoint;
+	tmp: integer;
 begin
 	sen := (Sender as TImage);
 	pos := GetPos (Point (last.Left, last.Top));
 	pos2 := GetPos (Point (sen.Left, sen.Top));
 	
-	moved [pos.X + 8 * (pos.Y - 1)] := true;
-	moved [pos2.X + 8 * (pos2.Y - 1)] := true;
+	tmp := positions [pos2.X + 8 * (pos2.Y - 1)];
 	positions [pos2.X + 8 * (pos2.Y - 1)] := positions [pos.X + 8 * (pos.Y - 1)];
 	positions [pos.X + 8 * (pos.Y - 1)] := 0;
 	
-	SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
+	latest := Point (last.Left, last.Top);
 	last.Top := sen.Top - 8;
 	last.Left := sen.Left - 8;
+	SendMessage (self.Handle, UM_CHESS, 0, 0);
 	
-	if (last.Tag mod 10 = 6) and ((last.Top = 32) or (last.Top = 480)) then
+	if ((WhiteChess) and (Last.Tag div 10 = 1)) or ((BlackChess) and (Last.Tag div 10 = 2)) then
 	begin
-		pictureSelect := true;
-		if last.Tag div 10 = 1 then
+		last.Left := latest.X;
+		last.Top := latest.Y;
+		positions [pos.X + 8 * (pos.Y - 1)] := positions [pos2.X + 8 * (pos2.Y - 1)];
+		positions [pos2.X + 8 * (pos2.Y - 1)] := tmp;
+		PostMessage (self.Handle, UM_CHESS, 0, 0);
+	end
+	else
+	begin
+		moved [pos.X + 8 * (pos.Y - 1)] := true;
+		moved [pos2.X + 8 * (pos2.Y - 1)] := true;
+		
+		SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
+		last.Top := sen.Top - 8;
+		last.Left := sen.Left - 8;
+		
+		if (last.Tag mod 10 = 6) and ((last.Top = 32) or (last.Top = 480)) then
 		begin
-			PictureWhiteBishop.Visible := true;
-			PictureWhiteRook.Visible := true;
-			PictureWhiteQueen.Visible := true;
-			PictureWhiteKnight.Visible := true;
-		end
-		else
-		begin
-			PictureBlackBishop.Visible := true;
-			PictureBlackRook.Visible := true;
-			PictureBlackQueen.Visible := true;
-			PictureBlackKnight.Visible := true;
+			pictureSelect := true;
+			if last.Tag div 10 = 1 then
+			begin
+				PictureWhiteBishop.Visible := true;
+				PictureWhiteRook.Visible := true;
+				PictureWhiteQueen.Visible := true;
+				PictureWhiteKnight.Visible := true;
+			end
+			else
+			begin
+				PictureBlackBishop.Visible := true;
+				PictureBlackRook.Visible := true;
+				PictureBlackQueen.Visible := true;
+				PictureBlackKnight.Visible := true;
+			end;
 		end;
-	end;
-	
-	whitePlays := not whitePlays;
+		
+		whitePlays := not whitePlays;
 
-	PostMessage (self.Handle, UM_CHESS, 0, 0);
-	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+		PostMessage (self.Handle, UM_CHESS, 0, 0);
+		PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+	end;
 end;
 
 procedure TForm1.ImageClick(Sender: TObject);
