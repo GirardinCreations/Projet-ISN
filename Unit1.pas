@@ -67,8 +67,8 @@ type
 		procedure Image2Click(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
-		procedure CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
-		function GetPoss (typePion, x, y: integer): TList;
+		procedure CheckPos (chessChecker: boolean; var point, base: TPoint; var posss: TList; masque: byte);
+		function GetPoss (typePion, x, y: integer; chessChecker: boolean = false): TList;
 	private
 		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
 		procedure ExecutionHandler(var Msg: TMessage); message UM_EXECUTION;
@@ -136,7 +136,7 @@ Begin
 	Blues[nbBlue] := objet;
 End;
 
-procedure TForm1.CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
+procedure TForm1.CheckPos (chessChecker: boolean; var point, base: TPoint; var posss: TList; masque: byte);
 var
 	tmp: integer;
 	tmpb: byte;
@@ -158,14 +158,17 @@ begin
 			else
 			begin
 				if (tmp div 10) <> (positions [tmpp2.X + 8 * (tmpp2.Y - 1)] div 10) then
-					CreationObjet (point.X, point.Y, SelectionnableClick, true);
+					if chessChecker then
+						posss.Add(@point)
+					else
+						CreationObjet (point.X, point.Y, SelectionnableClick, true);
 				mask := mask - masque;
 			end;
 		end;
 	end;
 end;
 
-function TForm1.GetPoss (typePion, x, y: integer): TList;
+function TForm1.GetPoss (typePion, x, y: integer; chessChecker: boolean = false): TList;
 var
 	pos, tmp: TPoint;
 	posss: TList;
@@ -181,64 +184,67 @@ begin
 				 1: begin
 						for i := 1 to 8 do
 						begin
-							poss [i] := Point (pos.X + 64 * i, pos.Y); CheckPos (poss [i], pos, posss, 1);
-							poss [i + 8] := Point (pos.X, pos.Y + 64 * i); CheckPos (poss [i + 8], pos, posss, 2);
-							poss [i + 16] := Point (pos.X - 64 * i, pos.Y); CheckPos (poss [i + 16], pos, posss, 4);
-							poss [i + 24] := Point (pos.X, pos.Y - 64 * i); CheckPos (poss [i + 24], pos, posss, 8);
+							poss [i] := Point (pos.X + 64 * i, pos.Y); CheckPos (chessChecker, poss [i], pos, posss, 1);
+							poss [i + 8] := Point (pos.X, pos.Y + 64 * i); CheckPos (chessChecker, poss [i + 8], pos, posss, 2);
+							poss [i + 16] := Point (pos.X - 64 * i, pos.Y); CheckPos (chessChecker, poss [i + 16], pos, posss, 4);
+							poss [i + 24] := Point (pos.X, pos.Y - 64 * i); CheckPos (chessChecker, poss [i + 24], pos, posss, 8);
 						end;
 					end;
 				 2: begin
-						poss[1] := Point (pos.X + 64, pos.Y + 128); CheckPos (poss [1], pos, posss, 1);
-						poss[2] := Point (pos.X + 64, pos.Y - 128); CheckPos (poss [2], pos, posss, 2);
-						poss[3] := Point (pos.X + 128, pos.Y + 64); CheckPos (poss [3], pos, posss, 4);
-						poss[4] := Point (pos.X + 128, pos.Y - 64); CheckPos (poss [4], pos, posss, 8);
-						poss[5] := Point (pos.X - 64, pos.Y + 128); CheckPos (poss [5], pos, posss, 16);
-						poss[6] := Point (pos.X - 64, pos.Y - 128); CheckPos (poss [6], pos, posss, 32);
-						poss[7] := Point (pos.X - 128, pos.Y + 64); CheckPos (poss [7], pos, posss, 64);
-						poss[8] := Point (pos.X - 128, pos.Y - 64); CheckPos (poss [8], pos, posss, 128);
+						poss[1] := Point (pos.X + 64, pos.Y + 128); CheckPos (chessChecker, poss [1], pos, posss, 1);
+						poss[2] := Point (pos.X + 64, pos.Y - 128); CheckPos (chessChecker, poss [2], pos, posss, 2);
+						poss[3] := Point (pos.X + 128, pos.Y + 64); CheckPos (chessChecker, poss [3], pos, posss, 4);
+						poss[4] := Point (pos.X + 128, pos.Y - 64); CheckPos (chessChecker, poss [4], pos, posss, 8);
+						poss[5] := Point (pos.X - 64, pos.Y + 128); CheckPos (chessChecker, poss [5], pos, posss, 16);
+						poss[6] := Point (pos.X - 64, pos.Y - 128); CheckPos (chessChecker, poss [6], pos, posss, 32);
+						poss[7] := Point (pos.X - 128, pos.Y + 64); CheckPos (chessChecker, poss [7], pos, posss, 64);
+						poss[8] := Point (pos.X - 128, pos.Y - 64); CheckPos (chessChecker, poss [8], pos, posss, 128);
 					end;
 				 3: begin
 						for i := 1 to 8 do
 						begin
-							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); CheckPos (poss [i], pos, posss, 1);
-							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); CheckPos (poss [i + 8], pos, posss, 2);
-							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 16], pos, posss, 4);
-							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 24], pos, posss, 8);
+							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); CheckPos (chessChecker, poss [i], pos, posss, 1);
+							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); CheckPos (chessChecker, poss [i + 8], pos, posss, 2);
+							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); CheckPos (chessChecker, poss [i + 16], pos, posss, 4);
+							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); CheckPos (chessChecker, poss [i + 24], pos, posss, 8);
 						end;
 					end;
 				 4: begin
 						for i := 1 to 8 do
 						begin
-							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); CheckPos (poss [i], pos, posss, 1);
-							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); CheckPos (poss [i + 8], pos, posss, 2);
-							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 16], pos, posss, 4);
-							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); CheckPos (poss [i + 24], pos, posss, 8);
-							poss[i+32] := Point (pos.X + 64 * i, pos.Y); CheckPos (poss [i + 32], pos, posss, 16);
-							poss[i+40] := Point (pos.X, pos.Y + 64 * i); CheckPos (poss [i + 40], pos, posss, 32);
-							poss[i+48] := Point (pos.X - 64 * i, pos.Y); CheckPos (poss [i + 48], pos, posss, 64);
-							poss[i+56] := Point (pos.X, pos.Y - 64 * i); CheckPos (poss [i + 56], pos, posss, 128);
+							poss[i] := Point (pos.X + 64 * i, pos.Y + 64 * i); CheckPos (chessChecker, poss [i], pos, posss, 1);
+							poss[i+8] := Point (pos.X - 64 * i, pos.Y + 64 * i); CheckPos (chessChecker, poss [i + 8], pos, posss, 2);
+							poss[i+16] := Point (pos.X - 64 * i, pos.Y - 64 * i); CheckPos (chessChecker, poss [i + 16], pos, posss, 4);
+							poss[i+24] := Point (pos.X + 64 * i, pos.Y - 64 * i); CheckPos (chessChecker, poss [i + 24], pos, posss, 8);
+							poss[i+32] := Point (pos.X + 64 * i, pos.Y); CheckPos (chessChecker, poss [i + 32], pos, posss, 16);
+							poss[i+40] := Point (pos.X, pos.Y + 64 * i); CheckPos (chessChecker, poss [i + 40], pos, posss, 32);
+							poss[i+48] := Point (pos.X - 64 * i, pos.Y); CheckPos (chessChecker, poss [i + 48], pos, posss, 64);
+							poss[i+56] := Point (pos.X, pos.Y - 64 * i); CheckPos (chessChecker, poss [i + 56], pos, posss, 128);
 						end;
 					end;
 				 5: begin
-						poss[1] := Point (pos.X + 64, pos.Y + 64); CheckPos (poss [1], pos, posss, 1);
-						poss[2] := Point (pos.X - 64, pos.Y + 64); CheckPos (poss [2], pos, posss, 2);
-						poss[3] := Point (pos.X - 64, pos.Y - 64); CheckPos (poss [3], pos, posss, 4);
-						poss[4] := Point (pos.X + 64, pos.Y - 64); CheckPos (poss [4], pos, posss, 8);
-						poss[5] := Point (pos.X + 64, pos.Y); CheckPos (poss [5], pos, posss, 16);
-						poss[6] := Point (pos.X, pos.Y + 64); CheckPos (poss [6], pos, posss, 32);
-						poss[7] := Point (pos.X - 64, pos.Y); CheckPos (poss [7], pos, posss, 64);
-						poss[8] := Point (pos.X, pos.Y - 64); CheckPos (poss [8], pos, posss, 128);
+						poss[1] := Point (pos.X + 64, pos.Y + 64); CheckPos (chessChecker, poss [1], pos, posss, 1);
+						poss[2] := Point (pos.X - 64, pos.Y + 64); CheckPos (chessChecker, poss [2], pos, posss, 2);
+						poss[3] := Point (pos.X - 64, pos.Y - 64); CheckPos (chessChecker, poss [3], pos, posss, 4);
+						poss[4] := Point (pos.X + 64, pos.Y - 64); CheckPos (chessChecker, poss [4], pos, posss, 8);
+						poss[5] := Point (pos.X + 64, pos.Y); CheckPos (chessChecker, poss [5], pos, posss, 16);
+						poss[6] := Point (pos.X, pos.Y + 64); CheckPos (chessChecker, poss [6], pos, posss, 32);
+						poss[7] := Point (pos.X - 64, pos.Y); CheckPos (chessChecker, poss [7], pos, posss, 64);
+						poss[8] := Point (pos.X, pos.Y - 64); CheckPos (chessChecker, poss [8], pos, posss, 128);
 					end;
 				 6: begin
 						if (typePion div 10) = 1 then
 						begin
 							if positions [GetPos (Point (pos.X, pos.Y - 64)).X + 8 * (GetPos (Point (pos.X, pos.Y - 64)).Y - 1)] = 0 then
 							begin
-								poss[1] := Point (pos.X, pos.Y - 64); CheckPos (poss [1], pos, posss, 1);
+								poss[1] := Point (pos.X, pos.Y - 64);
+								CheckPos (chessChecker, poss [1], pos, posss, 1);
+								
 								if (positions [GetPos (Point (pos.X, pos.Y - 128)).X + 8 * (GetPos (Point (pos.X, pos.Y - 128)).Y - 1)] = 0)
 									and not (moved [GetPos (pos).X + 8 * (GetPos (pos).Y - 1)]) then
 									begin
-										poss[2] := Point (pos.X, pos.Y - 128); CheckPos (poss [2], pos, posss, 1);
+										poss[2] := Point (pos.X, pos.Y - 128);
+										CheckPos (chessChecker, poss [2], pos, posss, 1);
 									end;
 							end;
 							
@@ -246,25 +252,36 @@ begin
 							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[3] := Point (pos.X - 64, pos.Y - 64); CreationObjet (pos.X - 64, pos.Y - 64, SelectionnableClick, true);
+									poss[3] := Point (pos.X - 64, pos.Y - 64);
+									if chessChecker then
+										CheckPos (chessChecker, poss [3], pos, posss, 2)
+									else
+										CreationObjet (pos.X - 64, pos.Y - 64, SelectionnableClick, true);
 								end;
 							
 							tmp := GetPos (Point (pos.X + 64, pos.Y - 64));
 							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[4] := Point (pos.X + 64, pos.Y - 64); CreationObjet (pos.X + 64, pos.Y - 64, SelectionnableClick, true);
+									poss[4] := Point (pos.X + 64, pos.Y - 64);
+									if chessChecker then
+										CheckPos (chessChecker, poss [4], pos, posss, 4)
+									else
+										CreationObjet (pos.X + 64, pos.Y - 64, SelectionnableClick, true);
 								end;
 						end
 						else
 						begin
 							if positions [GetPos (Point (pos.X, pos.Y + 64)).X + 8 * (GetPos (Point (pos.X, pos.Y + 64)).Y - 1)] = 0 then
 							begin
-								poss[1] := Point (pos.X, pos.Y + 64); CheckPos (poss [1], pos, posss, 1);
+								poss[1] := Point (pos.X, pos.Y + 64);
+								CheckPos (chessChecker, poss [1], pos, posss, 1);
+								
 								if (positions [GetPos (Point (pos.X, pos.Y + 128)).X + 8 * (GetPos (Point (pos.X, pos.Y + 128)).Y - 1)] = 0)
 									and not (moved [GetPos (pos).X + 8 * (GetPos (pos).Y - 1)]) then
 									begin
-										poss[2] := Point (pos.X, pos.Y + 128); CheckPos (poss [2], pos, posss, 1);
+										poss[2] := Point (pos.X, pos.Y + 128);
+										CheckPos (chessChecker, poss [2], pos, posss, 1);
 									end;
 							end;
 							
@@ -272,14 +289,22 @@ begin
 							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[3] := Point (pos.X - 64, pos.Y + 64); CreationObjet (pos.X - 64, pos.Y + 64, SelectionnableClick, true);
+									poss[3] := Point (pos.X - 64, pos.Y + 64);
+									if chessChecker then
+										CheckPos (chessChecker, poss [3], pos, posss, 2)
+									else
+										CreationObjet (pos.X - 64, pos.Y + 64, SelectionnableClick, true);
 								end;
 							
 							tmp := GetPos (Point (pos.X + 64, pos.Y + 64));
 							if ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> (typePion div 10))
 								and ((positions [tmp.X + 8 * (tmp.Y - 1)] div 10) <> 0) then
 								begin
-									poss[4] := Point (pos.X + 64, pos.Y + 64); CreationObjet (pos.X + 64, pos.Y + 64, SelectionnableClick, true);
+									poss[4] := Point (pos.X + 64, pos.Y + 64);
+									if chessChecker then
+										CheckPos (chessChecker, poss [4], pos, posss, 4)
+									else
+										CreationObjet (pos.X + 64, pos.Y + 64, SelectionnableClick, true);
 								end;
 						end;
 					end;
@@ -321,19 +346,51 @@ end;
 
 procedure TForm1.ChessHandler (var Msg: TMessage);
 var
-	i: integer;
-	tmp: TImage;
+	i, j: integer;
+	tmp, BKing, WKing: TImage;
+	PBK, PWK, pos: TPoint;
+	lis: TList;
+	White, Black: boolean;
 begin
-	for i := 1 to 32 do
+	lis := TList.Create;
+	BKing := FindComponent ('Image14') as TImage;
+	WKing := FindComponent ('Image15') as TImage;
+	PBK := Point (BKing.Left, BKing.Top);
+	PWK := Point (WKing.Left, WKing.Top);
+	White := false;
+	Black := false;
+	
+	for j := 1 to 32 do
 	begin
-		tmp := FindComponent ('Image' + inttostr(i)) as TImage;
+		tmp := FindComponent ('Image' + inttostr(j)) as TImage;
 		if (tmp <> nil) then
-			if (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
+		begin
+			lis := GetPoss (tmp.Tag, tmp.Left, tmp.Top, true);
+			for i := 0 to lis.Count - 1 do
 			begin
-				tmp.Free;
-				break;
+				pos := TPoint (lis[i]^);
+				if (pos.X = PBK.X) and (pos.Y = PBK.Y) and (tmp.Tag div 10 = 1) then
+					Black := true;
+				if (pos.X = PWK.X) and (pos.Y = PWK.Y) and (tmp.Tag div 10 = 2) then
+					White := true;
 			end;
+		end;
 	end;
+	
+	if White then
+	begin
+		ChessWhite.Picture.Assign (PictureChess.Picture);
+		ChessWhite.Visible := true;
+	end
+	else
+		ChessWhite.Visible := false;
+	if Black then
+	begin
+		ChessBlack.Picture.Assign (PictureChess.Picture);
+		ChessBlack.Visible := true;
+	end
+	else
+		ChessBlack.Visible := false;
 end;
 
 procedure TForm1.SelectionnableClick(Sender: TObject);
@@ -375,6 +432,7 @@ begin
 	
 	whitePlays := not whitePlays;
 
+	PostMessage (self.Handle, UM_CHESS, 0, 0);
 	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 end;
 
