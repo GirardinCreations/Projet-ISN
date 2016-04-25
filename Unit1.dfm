@@ -3,6 +3,7 @@ object Form1: TForm1
   Top = 116
   Width = 737
   Height = 632
+  Caption = 'Jeu d'#39#201'checs'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

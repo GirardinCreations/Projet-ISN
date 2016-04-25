@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, jpeg, ExtCtrls, Menus, Unit1;
+  Dialogs, jpeg, ExtCtrls, Menus, Unit1, Shogi;
 
 type
   TForm2 = class(TForm)
@@ -51,7 +51,11 @@ end;
 
 procedure TForm2.LaunchShogi(Sender: TObject);
 begin
-	{comment to avoid deletion}
+	Form2.Hide;
+	Application.CreateForm(TForm3, Form3);
+	Form3.ShowModal;
+	Form3.Free;
+	Form2.Show;
 end;
 
 end.
