@@ -3,7 +3,7 @@ unit Unit1;
 interface
 uses
 	Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-	Dialogs, ExtCtrls, StdCtrls;
+	Dialogs, jpeg, ExtCtrls, StdCtrls;
 
 const
 	UM_DESTROYBLUES = WM_APP + 1;

@@ -1,40 +1,42 @@
 unit Main;
 
 interface
-
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, jpeg, ExtCtrls, Menus, Unit1, Shogi;
+	Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+	Dialogs, jpeg, ExtCtrls, Menus, Unit1, Shogi, KOTH;
 
 type
-  TForm2 = class(TForm)
-    MainMenu1: TMainMenu;
-    Fichier1: TMenuItem;
-    Aide1: TMenuItem;
-    VersionWeb1: TMenuItem;
-    VersionWindows1: TMenuItem;
-    NouvellePartie1: TMenuItem;
-    N1: TMenuItem;
-    checs1: TMenuItem;
-    Shogi1: TMenuItem;
-    CommingSoon1: TMenuItem;
-    N2: TMenuItem;
-    Aide2: TMenuItem;
-    Quitter1: TMenuItem;
-    Paramtres1: TMenuItem;
-    Langue1: TMenuItem;
-    Image1: TImage;
-    Image2: TImage;
-    procedure LaunchChess(Sender: TObject);
-    procedure LaunchShogi(Sender: TObject);
-  private
-    { Déclarations privées }
-  public
-    { Déclarations publiques }
-  end;
+	TForm2 = class(TForm)
+		MainMenu1: TMainMenu;
+		Fichier1: TMenuItem;
+		Aide1: TMenuItem;
+		VersionWeb1: TMenuItem;
+		VersionWindows1: TMenuItem;
+		NouvellePartie1: TMenuItem;
+		N1: TMenuItem;
+		checs1: TMenuItem;
+		Shogi1: TMenuItem;
+		CommingSoon1: TMenuItem;
+		N2: TMenuItem;
+		Aide2: TMenuItem;
+		Quitter1: TMenuItem;
+		Paramtres1: TMenuItem;
+		Langue1: TMenuItem;
+		Image1: TImage;
+		Image2: TImage;
+		Image3: TImage;
+		KingOfTheHill1: TMenuItem;
+		procedure LaunchChess(Sender: TObject);
+		procedure LaunchShogi(Sender: TObject);
+		procedure LaunchKOTH(Sender: TObject);
+	private
+		{ Déclarations privées }
+	public
+		{ Déclarations publiques }
+	end;
 
 var
-  Form2: TForm2;
+	Form2: TForm2;
 
 implementation
 
@@ -55,6 +57,15 @@ begin
 	Application.CreateForm(TForm3, Form3);
 	Form3.ShowModal;
 	Form3.Free;
+	Form2.Show;
+end;
+
+procedure TForm2.LaunchKOTH(Sender: TObject);
+begin
+	Form2.Hide;
+	Application.CreateForm(TForm4, Form4);
+	Form4.ShowModal;
+	Form4.Free;
 	Form2.Show;
 end;
 
