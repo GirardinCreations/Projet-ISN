@@ -3,7 +3,7 @@ unit Main;
 interface
 uses
 	Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-	Dialogs, jpeg, ExtCtrls, Menus, Unit1, Shogi, KOTH;
+	Dialogs, jpeg, ExtCtrls, Menus, Unit1, Shogi, KOTH, TC;
 
 type
 	TForm2 = class(TForm)
@@ -26,9 +26,11 @@ type
 		Image2: TImage;
 		Image3: TImage;
 		KingOfTheHill1: TMenuItem;
+    Image4: TImage;
 		procedure LaunchChess(Sender: TObject);
 		procedure LaunchShogi(Sender: TObject);
 		procedure LaunchKOTH(Sender: TObject);
+		procedure LaunchTC(Sender: TObject);
 	private
 		{ Déclarations privées }
 	public
@@ -66,6 +68,15 @@ begin
 	Application.CreateForm(TForm4, Form4);
 	Form4.ShowModal;
 	Form4.Free;
+	Form2.Show;
+end;
+
+procedure TForm2.LaunchTC(Sender: TObject);
+begin
+	Form2.Hide;
+	Application.CreateForm(TForm5, Form5);
+	Form5.ShowModal;
+	Form5.Free;
 	Form2.Show;
 end;
 
