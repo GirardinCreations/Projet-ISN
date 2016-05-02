@@ -1,7 +1,7 @@
 object Form3: TForm3
-  Left = 194
-  Top = 113
-  Width = 928
+  Left = 200
+  Top = 87
+  Width = 1003
   Height = 649
   Caption = 'Jeu de Shogi'
   Color = clBtnFace
@@ -11,6 +11,7 @@ object Form3: TForm3
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Fond: TImage
@@ -10268,8 +10269,8 @@ object Form3: TForm3
       C426FA626234C3069D96C679E4AD67FFD9}
   end
   object PictureWLance: TImage
-    Left = 600
-    Top = 16
+    Left = 920
+    Top = 352
     Width = 48
     Height = 48
     AutoSize = True
@@ -10494,10 +10495,11 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureWKnight: TImage
-    Left = 656
-    Top = 16
+    Left = 920
+    Top = 304
     Width = 48
     Height = 48
     AutoSize = True
@@ -10722,10 +10724,11 @@ object Form3: TForm3
       FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF00
       00FF}
     Transparent = True
+    Visible = False
   end
   object PictureWSilver: TImage
-    Left = 712
-    Top = 16
+    Left = 824
+    Top = 304
     Width = 48
     Height = 48
     AutoSize = True
@@ -10950,10 +10953,11 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureWGold: TImage
-    Left = 768
-    Top = 16
+    Left = 776
+    Top = 352
     Width = 48
     Height = 48
     AutoSize = True
@@ -11178,10 +11182,11 @@ object Form3: TForm3
       FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF00
       00FF}
     Transparent = True
+    Visible = False
   end
   object PictureKing: TImage
-    Left = 824
-    Top = 16
+    Left = 776
+    Top = 304
     Width = 48
     Height = 48
     AutoSize = True
@@ -11406,10 +11411,11 @@ object Form3: TForm3
       FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF00
       00FF}
     Transparent = True
+    Visible = False
   end
   object PictureWBishop: TImage
-    Left = 600
-    Top = 72
+    Left = 824
+    Top = 352
     Width = 48
     Height = 48
     AutoSize = True
@@ -11634,10 +11640,11 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureWRook: TImage
-    Left = 656
-    Top = 72
+    Left = 872
+    Top = 352
     Width = 48
     Height = 48
     AutoSize = True
@@ -11862,10 +11869,11 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureWPawn: TImage
-    Left = 713
-    Top = 72
+    Left = 872
+    Top = 304
     Width = 48
     Height = 48
     AutoSize = True
@@ -12090,10 +12098,12 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureWLance2: TImage
-    Left = 769
-    Top = 72
+    Tag = 111
+    Left = 729
+    Top = 352
     Width = 48
     Height = 48
     AutoSize = True
@@ -12318,10 +12328,13 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureWKnight2: TImage
-    Left = 825
-    Top = 72
+    Tag = 112
+    Left = 729
+    Top = 304
     Width = 48
     Height = 48
     AutoSize = True
@@ -12546,10 +12559,13 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureWSilver2: TImage
-    Left = 601
-    Top = 128
+    Tag = 113
+    Left = 633
+    Top = 304
     Width = 48
     Height = 48
     AutoSize = True
@@ -12774,10 +12790,13 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureWBishop2: TImage
-    Left = 657
-    Top = 128
+    Tag = 116
+    Left = 633
+    Top = 352
     Width = 48
     Height = 48
     AutoSize = True
@@ -13002,10 +13021,13 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureWRook2: TImage
-    Left = 713
-    Top = 128
+    Tag = 117
+    Left = 681
+    Top = 352
     Width = 48
     Height = 48
     AutoSize = True
@@ -13230,10 +13252,13 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureWPawn2: TImage
-    Left = 769
-    Top = 128
+    Tag = 118
+    Left = 681
+    Top = 304
     Width = 48
     Height = 48
     AutoSize = True
@@ -13458,10 +13483,12 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureBLance: TImage
-    Left = 600
-    Top = 184
+    Left = 920
+    Top = 208
     Width = 48
     Height = 48
     AutoSize = True
@@ -13686,10 +13713,11 @@ object Form3: TForm3
       4D289B4C279B4B279C4C299C4D299B4B2B9E4D1DAB2200FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureBKnight: TImage
-    Left = 656
-    Top = 184
+    Left = 920
+    Top = 256
     Width = 48
     Height = 48
     AutoSize = True
@@ -13914,10 +13942,11 @@ object Form3: TForm3
       9C2C509C2B4F9B2B4F9B2B4E9B2C509D2B4E9B2D509E1620A60000FF0000FF00
       00FF}
     Transparent = True
+    Visible = False
   end
   object PictureBSilver: TImage
-    Left = 712
-    Top = 184
+    Left = 824
+    Top = 256
     Width = 48
     Height = 48
     AutoSize = True
@@ -14142,10 +14171,11 @@ object Form3: TForm3
       522C9D532C995227964A3FE86747FE7143F46D5AFF8B20E12600FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureBGold: TImage
-    Left = 768
-    Top = 184
+    Left = 776
+    Top = 208
     Width = 48
     Height = 48
     AutoSize = True
@@ -14370,10 +14400,11 @@ object Form3: TForm3
       9D2D549D2C549B2D559D2E559D2D559D2D549C2D5C9E2948851215BB0000FF00
       00FF}
     Transparent = True
+    Visible = False
   end
   object PictureJewel: TImage
-    Left = 824
-    Top = 184
+    Left = 776
+    Top = 256
     Width = 48
     Height = 48
     AutoSize = True
@@ -14598,10 +14629,11 @@ object Form3: TForm3
       BD58AFBD58AEBC56ADBB59AFBD5AB0BE5AB0BE55ABB963B7C531518E0000FF00
       00FF}
     Transparent = True
+    Visible = False
   end
   object PictureBBishop: TImage
-    Left = 600
-    Top = 240
+    Left = 824
+    Top = 208
     Width = 48
     Height = 48
     AutoSize = True
@@ -14826,10 +14858,11 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureBRook: TImage
-    Left = 656
-    Top = 240
+    Left = 872
+    Top = 208
     Width = 48
     Height = 48
     AutoSize = True
@@ -15054,10 +15087,11 @@ object Form3: TForm3
       562E9C542D9C542E9E562F9E562E9D552F9D562D9D5435A95E0FC01500FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureBPawn: TImage
-    Left = 713
-    Top = 240
+    Left = 873
+    Top = 256
     Width = 48
     Height = 48
     AutoSize = True
@@ -15282,10 +15316,12 @@ object Form3: TForm3
       4A289B4A299D4B299C4A289C4A279A492B995527953300FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
   end
   object PictureBLance2: TImage
-    Left = 769
-    Top = 240
+    Tag = 211
+    Left = 729
+    Top = 208
     Width = 48
     Height = 48
     AutoSize = True
@@ -15510,10 +15546,13 @@ object Form3: TForm3
       342398352598352B9B391F912F1F91302A9C39289B392EBF3500FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureBKnight2: TImage
-    Left = 825
-    Top = 240
+    Tag = 122
+    Left = 729
+    Top = 256
     Width = 48
     Height = 48
     AutoSize = True
@@ -15738,10 +15777,13 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureBSilver2: TImage
-    Left = 601
-    Top = 296
+    Tag = 213
+    Left = 633
+    Top = 256
     Width = 48
     Height = 48
     AutoSize = True
@@ -15966,10 +16008,13 @@ object Form3: TForm3
       352398362397362397352196332397352396352597362A9C3B29B32F00FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureBBishop2: TImage
-    Left = 657
-    Top = 296
+    Tag = 216
+    Left = 633
+    Top = 208
     Width = 48
     Height = 48
     AutoSize = True
@@ -16194,10 +16239,13 @@ object Form3: TForm3
       402FA5452DA3432DA3432DA3432CA3422CA2422EA343359D531FA62700FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureBRook2: TImage
-    Left = 713
-    Top = 296
+    Tag = 217
+    Left = 681
+    Top = 208
     Width = 48
     Height = 48
     AutoSize = True
@@ -16422,10 +16470,13 @@ object Form3: TForm3
       442BA2422CA3432DA3432DA2422DA3422CA3432EA3433C9E581CA92000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
   end
   object PictureBPawn2: TImage
-    Left = 769
-    Top = 296
+    Tag = 218
+    Left = 681
+    Top = 256
     Width = 48
     Height = 48
     AutoSize = True
@@ -16650,5 +16701,34 @@ object Form3: TForm3
       0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
       FF00}
     Transparent = True
+    Visible = False
+    OnClick = Image2Click
+  end
+  object PictureRed: TImage
+    Tag = 200
+    Left = 600
+    Top = 288
+    Width = 32
+    Height = 32
+    Picture.Data = {
+      07544269746D61703A000000424D3A0000000000000036000000280000000100
+      0000010000000100180000000000040000000000000000000000000000000000
+      0000241CED00}
+    Stretch = True
+    Visible = False
+    OnClick = Image2Click
+  end
+  object PictureBlue: TImage
+    Tag = 200
+    Left = 600
+    Top = 320
+    Width = 32
+    Height = 32
+    Picture.Data = {
+      07544269746D61703A000000424D3A0000000000000036000000280000000100
+      0000010000000100180000000000040000000000000000000000000000000000
+      0000E8A20000}
+    Stretch = True
+    Visible = False
   end
 end

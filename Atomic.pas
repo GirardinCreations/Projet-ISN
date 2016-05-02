@@ -611,7 +611,7 @@ var
 begin
 	sen := (Sender as TImage);
 	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
-	if (sen.Tag div 10 = 2) xor (whitePlays) then
+	if ((sen.Tag div 10 = 2) xor (whitePlays)) and not pictureSelect then
 	begin
 
 		last := sen;

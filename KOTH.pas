@@ -438,52 +438,51 @@ begin
 	WhiteChess := false;
 	BlackChess := false;
 	
-	if ((BKing.Left = 224) or (BKing.Left = 288)) and ((BKing.Top = 224) or (BKing.Top = 288)) then
+	for j := 1 to 32 do
 	begin
-		pictureSelect := true;
-		ChessWhite.Picture.Assign (PictureChessMat.Picture);
+		tmp := FindComponent ('Image' + inttostr(j)) as TImage;
+		if (tmp <> nil) then
+		begin
+			lis := GetPoss (tmp.Tag, tmp.Left, tmp.Top, true);
+			for i := 0 to lis.Count - 1 do
+			begin
+				pos := TPoint (lis[i]^);
+				if (pos.X = PBK.X) and (pos.Y = PBK.Y) and (tmp.Tag div 10 = 1) then
+					BlackChess := true;
+				if (pos.X = PWK.X) and (pos.Y = PWK.Y) and (tmp.Tag div 10 = 2) then
+					WhiteChess := true;
+			end;
+		end;
+	end;
+		
+	if WhiteChess then
+	begin
+		ChessWhite.Picture.Assign (PictureChess.Picture);
 		ChessWhite.Visible := true;
 	end
-	else if ((WKing.Left = 224) or (WKing.Left = 288)) and ((WKing.Top = 224) or (WKing.Top = 288)) then
+	else
+		ChessWhite.Visible := false;
+	if BlackChess then
 	begin
-		pictureSelect := true;
-		ChessBlack.Picture.Assign (PictureChessMat.Picture);
+		ChessBlack.Picture.Assign (PictureChess.Picture);
 		ChessBlack.Visible := true;
 	end
 	else
-	begin
-		for j := 1 to 32 do
+		ChessBlack.Visible := false;
+	if not WhiteChess then
+		if ((WKing.Left = 224) or (WKing.Left = 288)) and ((WKing.Top = 224) or (WKing.Top = 288)) then
 		begin
-			tmp := FindComponent ('Image' + inttostr(j)) as TImage;
-			if (tmp <> nil) then
-			begin
-				lis := GetPoss (tmp.Tag, tmp.Left, tmp.Top, true);
-				for i := 0 to lis.Count - 1 do
-				begin
-					pos := TPoint (lis[i]^);
-					if (pos.X = PBK.X) and (pos.Y = PBK.Y) and (tmp.Tag div 10 = 1) then
-						BlackChess := true;
-					if (pos.X = PWK.X) and (pos.Y = PWK.Y) and (tmp.Tag div 10 = 2) then
-						WhiteChess := true;
-				end;
-			end;
-		end;
-		
-		if WhiteChess then
-		begin
-			ChessWhite.Picture.Assign (PictureChess.Picture);
-			ChessWhite.Visible := true;
-		end
-		else
-			ChessWhite.Visible := false;
-		if BlackChess then
-		begin
-			ChessBlack.Picture.Assign (PictureChess.Picture);
+			pictureSelect := true;
+			ChessBlack.Picture.Assign (PictureChessMat.Picture);
 			ChessBlack.Visible := true;
-		end
-		else
-			ChessBlack.Visible := false;
-	end;
+		end;
+	if not BlackChess then
+		if ((BKing.Left = 224) or (BKing.Left = 288)) and ((BKing.Top = 224) or (BKing.Top = 288)) then
+		begin
+			pictureSelect := true;
+			ChessWhite.Picture.Assign (PictureChessMat.Picture);
+			ChessWhite.Visible := true;
+		end;
 end;
 
 procedure TForm4.SelectionnableClick(Sender: TObject);
@@ -643,7 +642,7 @@ var
 begin
 	sen := (Sender as TImage);
 	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
-	if (sen.Tag div 10 = 2) xor (whitePlays) then
+	if ((sen.Tag div 10 = 2) xor (whitePlays)) and not pictureSelect then
 	begin
 
 		last := sen;
