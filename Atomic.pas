@@ -382,25 +382,41 @@ var
 	i: integer;
 	tmp: TImage;
 	tmpp: TPoint;
+	exec: boolean;
 begin
+	exec := false;
 	for i := 1 to 32 do
 	begin
 		tmp := FindComponent ('Image' + inttostr(i)) as TImage;
 		if (tmp <> nil) then
 		begin
-			if (tmp.Tag <> last.Tag) and (tmp.Left = Msg.WParam) and(tmp.Top = Msg.LParam) then
+			if (tmp.Tag <> last.Tag) and (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
 			begin
 				tmpp := GetPos (Point (tmp.Left, tmp.Top));
 				positions [tmpp.X + 8 * (tmpp.Y - 1)] := 0;
 				tmp.Free;
+				exec := true;
 			end;
-			if (tmp.Tag <> last.Tag) and (tmp.Tag mod 10 <> 6) and
-			   ((tmp.Left = Msg.WParam) or (tmp.Left = Msg.WParam - 64) or (tmp.Left = Msg.WParam + 64)) and
-			   ((tmp.Top = Msg.LParam) or (tmp.Top = Msg.LParam - 64) or (tmp.Top = Msg.LParam + 64)) then
+		end;
+	end;
+	if exec then
+	begin
+		tmpp := GetPos (Point (last.Left, last.Top));
+		positions [tmpp.X + 8 * (tmpp.Y - 1)] := 0;
+		last.Free;
+		for i := 1 to 32 do
+		begin
+			tmp := FindComponent ('Image' + inttostr(i)) as TImage;
+			if (tmp <> nil) then
 			begin
-				tmpp := GetPos (Point (tmp.Left, tmp.Top));
-				positions [tmpp.X + 8 * (tmpp.Y - 1)] := 0;
-				tmp.Free;
+				if (tmp.Tag mod 10 <> 6) and (tmp.Tag <> last.Tag) and
+					((tmp.Left = Msg.WParam) or (tmp.Left = Msg.WParam - 64) or (tmp.Left = Msg.WParam + 64)) and
+					((tmp.Top = Msg.LParam) or (tmp.Top = Msg.LParam - 64) or (tmp.Top = Msg.LParam + 64)) then
+				begin
+					tmpp := GetPos (Point (tmp.Left, tmp.Top));
+					positions [tmpp.X + 8 * (tmpp.Y - 1)] := 0;
+					tmp.Free;
+				end;
 			end;
 		end;
 	end;
@@ -416,42 +432,57 @@ begin
 	lis := TList.Create;
 	BKing := FindComponent ('Image14') as TImage;
 	WKing := FindComponent ('Image15') as TImage;
-	PBK := Point (BKing.Left, BKing.Top);
-	PWK := Point (WKing.Left, WKing.Top);
-	WhiteChess := false;
-	BlackChess := false;
-	
-	for j := 1 to 32 do
+	if BKing = nil then
 	begin
-		tmp := FindComponent ('Image' + inttostr(j)) as TImage;
-		if (tmp <> nil) then
+		ChessBlack.Picture.Assign (PictureChessMat.Picture);
+		ChessBlack.Visible := true;
+		pictureSelect := true;
+	end
+	else if WKing = nil then
+	begin
+		ChessWhite.Picture.Assign (PictureChessMat.Picture);
+		ChessWhite.Visible := true;
+		pictureSelect := true;
+	end;
+	if not pictureSelect then
+	begin
+		PBK := Point (BKing.Left, BKing.Top);
+		PWK := Point (WKing.Left, WKing.Top);
+		WhiteChess := false;
+		BlackChess := false;
+		
+		for j := 1 to 32 do
 		begin
-			lis := GetPoss (tmp.Tag, tmp.Left, tmp.Top, true);
-			for i := 0 to lis.Count - 1 do
+			tmp := FindComponent ('Image' + inttostr(j)) as TImage;
+			if (tmp <> nil) then
 			begin
-				pos := TPoint (lis[i]^);
-				if (pos.X = PBK.X) and (pos.Y = PBK.Y) and (tmp.Tag div 10 = 1) then
-					BlackChess := true;
-				if (pos.X = PWK.X) and (pos.Y = PWK.Y) and (tmp.Tag div 10 = 2) then
-					WhiteChess := true;
+				lis := GetPoss (tmp.Tag, tmp.Left, tmp.Top, true);
+				for i := 0 to lis.Count - 1 do
+				begin
+					pos := TPoint (lis[i]^);
+					if (pos.X = PBK.X) and (pos.Y = PBK.Y) and (tmp.Tag div 10 = 1) then
+						BlackChess := true;
+					if (pos.X = PWK.X) and (pos.Y = PWK.Y) and (tmp.Tag div 10 = 2) then
+						WhiteChess := true;
+				end;
 			end;
 		end;
+		
+		if WhiteChess then
+		begin
+			ChessWhite.Picture.Assign (PictureChess.Picture);
+			ChessWhite.Visible := true;
+		end
+		else
+			ChessWhite.Visible := false;
+		if BlackChess then
+		begin
+			ChessBlack.Picture.Assign (PictureChess.Picture);
+			ChessBlack.Visible := true;
+		end
+		else
+			ChessBlack.Visible := false;
 	end;
-	
-	if WhiteChess then
-	begin
-		ChessWhite.Picture.Assign (PictureChess.Picture);
-		ChessWhite.Visible := true;
-	end
-	else
-		ChessWhite.Visible := false;
-	if BlackChess then
-	begin
-		ChessBlack.Picture.Assign (PictureChess.Picture);
-		ChessBlack.Visible := true;
-	end
-	else
-		ChessBlack.Visible := false;
 end;
 
 procedure TForm6.SelectionnableClick(Sender: TObject);
@@ -571,7 +602,7 @@ begin
 			moved [pos.X + 8 * (pos.Y - 1)] := true;
 			moved [pos2.X + 8 * (pos2.Y - 1)] := true;
 			
-			SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
+			//SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
 			last.Top := sen.Top - 8;
 			last.Left := sen.Left - 8;
 			
@@ -593,9 +624,9 @@ begin
 					PictureBlackKnight.Visible := true;
 				end;
 			end;
-			
 			whitePlays := not whitePlays;
 
+			PostMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
 			PostMessage (self.Handle, UM_CHESS, 0, 0);
 			PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 		end;
@@ -613,7 +644,6 @@ begin
 	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 	if ((sen.Tag div 10 = 2) xor (whitePlays)) and not pictureSelect then
 	begin
-
 		last := sen;
 		lis := GetPoss (sen.Tag, sen.Left, sen.Top);
 		for i := 0 to lis.Count - 1 do

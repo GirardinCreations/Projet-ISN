@@ -86,11 +86,11 @@ end;
 
 procedure TForm2.LaunchAtomic(Sender: TObject);
 begin
-	{Form2.Hide;
+	Form2.Hide;
 	Application.CreateForm(TForm6, Form6);
 	Form6.ShowModal;
 	Form6.Free;
-	Form2.Show;}
+	Form2.Show;
 end;
 
 end.
