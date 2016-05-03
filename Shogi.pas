@@ -8,6 +8,7 @@ uses
 const
 	UM_DESTROYBLUES = WM_APP + 1;
 	UM_EXECUTION = WM_APP + 2;
+	UM_CHESS = WM_APP + 3;
 type
 	TForm3 = class(TForm)
 		Fond: TImage;
@@ -52,6 +53,7 @@ type
 	private
 		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
 		procedure ExecutionHandler(var Msg: TMessage); message UM_EXECUTION;
+		procedure ChessHandler(var Msg: TMessage); message UM_CHESS;
 	public
 		{ Déclarations publiques }
 	end;
@@ -62,8 +64,9 @@ var
 	positions: Array [1..81] of integer;
 	moved: Array [1..81] of boolean;
 	Blues: Array [1..81] of TImage;
+	Kings: Array [1..2] of integer;
 	nbBlue, nbPion: integer;
-	whitePlays, pictureSelect: boolean;
+	whitePlays, pictureSelect, Block: boolean;
 	Last: TImage;
 	mask: byte;
 	TypePion: integer; // ou enum
@@ -127,24 +130,6 @@ begin
 		with objet do
 		begin
 			Parent := Form3;
-			case typePion of
-				101: begin Picture.Assign (PictureWLance.Picture); end;
-				102: begin Picture.Assign (PictureWKnight.Picture); end;
-				103: begin Picture.Assign (PictureWSilver.Picture); end;
-				104: begin Picture.Assign (PictureWGold.Picture); end;
-				105: begin Picture.Assign (PictureKing.Picture); end;
-				106: begin Picture.Assign (PictureWBishop.Picture); end;
-				107: begin Picture.Assign (PictureWRook.Picture); end;
-				108: begin Picture.Assign (PictureWPawn.Picture); end;
-				201: begin Picture.Assign (PictureBLance.Picture); end;
-				202: begin Picture.Assign (PictureBKnight.Picture); end;
-				203: begin Picture.Assign (PictureBSilver.Picture); end;
-				204: begin Picture.Assign (PictureBGold.Picture); end;
-				205: begin Picture.Assign (PictureJewel.Picture); end;
-				206: begin Picture.Assign (PictureBBishop.Picture); end;
-				207: begin Picture.Assign (PictureBRook.Picture); end;
-				208: begin Picture.Assign (PictureBPawn.Picture); end;
-			end;
 			Left := X;
 			Top := Y;
 			Height := 48;
@@ -156,6 +141,24 @@ begin
 			Tag := typePion;
 			inc(nbPion);
 			Name := 'Image' + inttostr (nbPion);
+			case typePion of
+				101: begin Picture.Assign (PictureWLance.Picture); end;
+				102: begin Picture.Assign (PictureWKnight.Picture); end;
+				103: begin Picture.Assign (PictureWSilver.Picture); end;
+				104: begin Picture.Assign (PictureWGold.Picture); end;
+				105: begin Picture.Assign (PictureKing.Picture); Kings [1] := nbPion; end;
+				106: begin Picture.Assign (PictureWBishop.Picture); end;
+				107: begin Picture.Assign (PictureWRook.Picture); end;
+				108: begin Picture.Assign (PictureWPawn.Picture); end;
+				201: begin Picture.Assign (PictureBLance.Picture); end;
+				202: begin Picture.Assign (PictureBKnight.Picture); end;
+				203: begin Picture.Assign (PictureBSilver.Picture); end;
+				204: begin Picture.Assign (PictureBGold.Picture); end;
+				205: begin Picture.Assign (PictureJewel.Picture); Kings [2] := nbPion; end;
+				206: begin Picture.Assign (PictureBBishop.Picture); end;
+				207: begin Picture.Assign (PictureBRook.Picture); end;
+				208: begin Picture.Assign (PictureBPawn.Picture); end;
+			end;
 		end;
 	end;
 end;
@@ -448,6 +451,7 @@ begin
 		dec (nbBlue);
 	end;
 end;
+
 procedure TForm3.ExecutionHandler(var Msg: TMessage);
 var
 	i: integer;
@@ -455,13 +459,24 @@ var
 begin
 	for i := 1 to nbPion do
 	begin
-		tmp := FindComponent ('Image' + inttostr(i)) as TImage;
+		tmp := FindComponent ('Image' + inttostr (i)) as TImage;
 		if (tmp <> nil) then
 			if (tmp.Tag <> last.Tag) and (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
 			begin
 				tmp.Free;
 				break;
 			end;
+	end;
+end;
+
+procedure TForm3.ChessHandler(var Msg: TMessage);
+begin
+	try
+		if ((FindComponent ('Image' + inttostr (Kings [1])) as TImage) = nil) or
+		   ((FindComponent ('Image' + inttostr (Kings [2])) as TImage) = nil) then
+			Block := true;
+	except
+		Block := true;
 	end;
 end;
 
@@ -484,34 +499,38 @@ begin
 	moved [pos2.X + 9 * (pos2.Y - 1)] := true;
 	
 	SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
+	SendMessage (self.Handle, UM_CHESS, 0, 0);
 	
 	last.Top := sen.Top - 8;
 	last.Left := sen.Left - 8;
 	
-	tmp := last.Tag;
-	
-	if (tmp mod 10 <> 4) and (tmp mod 10 <> 5) and ((tmp div 10) mod 10 = 0) then
-	if ((last.Top < 160) and whitePlays) or ((last.Top > 400) and not whitePlays) then
+	if not Block then
 	begin
-		pictureSelect := true;
-		case tmp of
-			101: PictureWLance2.Visible := true;
-			102: PictureWKnight2.Visible := true;
-			103: PictureWSilver2.Visible := true;
-			106: PictureWBishop2.Visible := true;
-			107: PictureWRook2.Visible := true;
-			108: PictureWPawn2.Visible := true;
-			201: PictureBLance2.Visible := true;
-			202: PictureBKnight2.Visible := true;
-			203: PictureBSilver2.Visible := true;
-			206: PictureBBishop2.Visible := true;
-			207: PictureBRook2.Visible := true;
-			208: PictureBPawn2.Visible := true;
+		tmp := last.Tag;
+		
+		if (tmp mod 10 <> 4) and (tmp mod 10 <> 5) and ((tmp div 10) mod 10 = 0) then
+		if ((last.Top < 160) and whitePlays) or ((last.Top > 400) and not whitePlays) then
+		begin
+			pictureSelect := true;
+			case tmp of
+				101: PictureWLance2.Visible := true;
+				102: PictureWKnight2.Visible := true;
+				103: PictureWSilver2.Visible := true;
+				106: PictureWBishop2.Visible := true;
+				107: PictureWRook2.Visible := true;
+				108: PictureWPawn2.Visible := true;
+				201: PictureBLance2.Visible := true;
+				202: PictureBKnight2.Visible := true;
+				203: PictureBSilver2.Visible := true;
+				206: PictureBBishop2.Visible := true;
+				207: PictureBRook2.Visible := true;
+				208: PictureBPawn2.Visible := true;
+			end;
+			PictureRed.Visible := true;
 		end;
-		PictureRed.Visible := true;
+		
+		whitePlays := not whitePlays;
 	end;
-	
-	whitePlays := not whitePlays;
 	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 end;
 
@@ -522,16 +541,19 @@ var
 	sen: TImage;
 	lis: TList;
 begin
-	sen := (Sender as TImage);
-	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
-	if ((sen.Tag div 100 = 2) xor (whitePlays)) and not pictureSelect then
+	if not Block then
 	begin
-		last := sen;
-		lis := GetPoss (sen.Tag, sen.Left, sen.Top);
-		for i := 0 to lis.Count - 1 do
+		sen := (Sender as TImage);
+		SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+		if ((sen.Tag div 100 = 2) xor (whitePlays)) and not pictureSelect then
 		begin
-			pos := TPoint (lis[i]^);
-			CreationObjet (pos.X, pos.Y, SelectionnableClick);
+			last := sen;
+			lis := GetPoss (sen.Tag, sen.Left, sen.Top);
+			for i := 0 to lis.Count - 1 do
+			begin
+				pos := TPoint (lis[i]^);
+				CreationObjet (pos.X, pos.Y, SelectionnableClick);
+			end;
 		end;
 	end;
 end;
@@ -570,6 +592,7 @@ var
 begin
 	whitePlays := true;
 	pictureSelect := false;
+	Block := false;
 	
 	for i := 1 to 81 do
 		Blues[i] := nil;
