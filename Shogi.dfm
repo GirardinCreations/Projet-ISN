@@ -1,7 +1,7 @@
 object Form3: TForm3
   Left = 200
   Top = 87
-  Width = 1003
+  Width = 1096
   Height = 649
   Caption = 'Jeu de Shogi'
   Color = clBtnFace
@@ -15090,7 +15090,7 @@ object Form3: TForm3
     Visible = False
   end
   object PictureBPawn: TImage
-    Left = 873
+    Left = 872
     Top = 256
     Width = 48
     Height = 48
@@ -15550,7 +15550,7 @@ object Form3: TForm3
     OnClick = Image2Click
   end
   object PictureBKnight2: TImage
-    Tag = 122
+    Tag = 212
     Left = 729
     Top = 256
     Width = 48

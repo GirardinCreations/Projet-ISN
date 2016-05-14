@@ -3,7 +3,7 @@ object Form5: TForm5
   Top = 116
   Width = 737
   Height = 632
-  Caption = 'Jeu d'#39#201'checs ~ Variante Three Check'
+  Caption = 'Jeu d'#39#201'checs ~ Variante Three Chess'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

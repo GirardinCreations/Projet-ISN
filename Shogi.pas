@@ -46,9 +46,12 @@ type
 		procedure CreationPiece(X, Y: integer; Click: TNotifyEvent; typePion: integer; red: boolean = false);
 		procedure ImageClick(Sender: TObject);
 		procedure Image2Click(Sender: TObject);
+		procedure Image3Click(Sender: TObject);
 		procedure SelectionnableClick(Sender: TObject);
+		procedure Selectionnable2Click(Sender: TObject);
 		procedure FormCreate(Sender: TObject);
 		procedure CheckPos (var point, base: TPoint; var posss: TList; masque: byte);
+		procedure KeepPawn (Tag, Top, Left: integer; var img: TImage);
 		function GetPoss (typePion, x, y: integer): TList;
 	private
 		procedure DestroyHandler(var Msg: TMessage); message UM_DESTROYBLUES;
@@ -66,6 +69,7 @@ var
 	Blues: Array [1..81] of TImage;
 	Kings: Array [1..2] of integer;
 	nbBlue, nbPion: integer;
+	nbWKeeped, nbBKeeped: integer;
 	whitePlays, pictureSelect, Block: boolean;
 	Last: TImage;
 	mask: byte;
@@ -463,6 +467,7 @@ begin
 		if (tmp <> nil) then
 			if (tmp.Tag <> last.Tag) and (tmp.Left = Msg.WParam) and (tmp.Top = Msg.LParam) then
 			begin
+				KeepPawn (tmp.Tag, tmp.Top, tmp.Left, tmp);
 				tmp.Free;
 				break;
 			end;
@@ -477,6 +482,30 @@ begin
 			Block := true;
 	except
 		Block := true;
+	end;
+end;
+
+procedure TForm3.KeepPawn (Tag, Top, Left: integer; var img: TImage);
+begin
+	if (Tag div 10 mod 10) = 1 then Tag := Tag - 10;
+	if (Tag mod 10) = 5 then Block := true else
+	if (Tag div 100) = 1 then
+	begin
+		Tag := Tag + 100;
+		if nbBKeeped < 10 then
+			CreationPiece (600 + nbBKeeped * 48, 88, Image3Click, Tag)
+		else
+			CreationPiece (600 + (nbBKeeped - 10) * 48, 40, Image3Click, Tag);
+		inc (nbBKeeped);
+	end
+	else
+	begin
+		Tag := Tag - 100;
+		if nbWKeeped < 10 then
+			CreationPiece (600 + nbWKeeped * 48, 472, Image3Click, Tag)
+		else
+			CreationPiece (600 + (nbWKeeped - 10) * 48, 520, Image3Click, Tag);
+		inc (nbWKeeped);
 	end;
 end;
 
@@ -534,6 +563,35 @@ begin
 	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
 end;
 
+procedure TForm3.Selectionnable2Click(Sender: TObject);
+var
+	sen: TImage;
+	pos, pos2: TPoint;
+begin
+	if not Block then
+	begin
+		sen := (Sender as TImage);
+		pos := GetPos (Point (last.Left, last.Top));
+		pos2 := GetPos (Point (sen.Left, sen.Top));
+		
+		positions [pos2.X + 9 * (pos2.Y - 1)] := positions [pos.X + 9 * (pos.Y - 1)];
+		positions [pos.X + 9 * (pos.Y - 1)] := 0;
+		
+		moved [pos.X + 9 * (pos.Y - 1)] := true;
+		moved [pos2.X + 9 * (pos2.Y - 1)] := true;
+		
+		SendMessage (self.Handle, UM_EXECUTION, sen.Left - 8, sen.Top - 8);
+		SendMessage (self.Handle, UM_CHESS, 0, 0);
+		
+		last.Top := sen.Top - 8;
+		last.Left := sen.Left - 8;
+		whitePlays := not whitePlays;
+	end;
+	
+	last.OnClick := ImageClick;
+	PostMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+end;
+
 procedure TForm3.ImageClick(Sender: TObject);
 var
 	i : Integer;
@@ -586,6 +644,26 @@ begin
 	pictureSelect := false;
 end;
 
+procedure TForm3.Image3Click(Sender: TObject);
+var
+	sen: TImage;
+	i: integer;
+begin
+	sen := (Sender as TImage);
+	SendMessage (self.Handle, UM_DESTROYBLUES, 0, 0);
+	if (sen.Tag div 100 = 2) xor (whitePlays) and not pictureSelect and not Block then
+	begin
+		last := sen;
+		for i := 1 to 81 do
+		begin
+			if positions [i] = 0 then
+			begin
+				CreationObjet (((i - 1) mod 9) * 64 + 24, ((i - 1) div 9) * 64 + 24, Selectionnable2Click);
+			end;
+		end;
+	end;
+end;
+
 procedure TForm3.FormCreate(Sender: TObject);
 var
 	i: integer;
@@ -593,6 +671,8 @@ begin
 	whitePlays := true;
 	pictureSelect := false;
 	Block := false;
+	nbBKeeped := 0;
+	nbWKeeped := 0;
 	
 	for i := 1 to 81 do
 		Blues[i] := nil;
@@ -603,9 +683,9 @@ begin
 	moved[18] := true;
 	moved[64] := true;
 	moved[72] := true;
-	for i := 28 to 54 do
-		moved[i] := true;
 	for i := 12 to 16 do
+		moved[i] := true;
+	for i := 28 to 54 do
 		moved[i] := true;
 	for i := 66 to 70 do
 		moved[i] := true;

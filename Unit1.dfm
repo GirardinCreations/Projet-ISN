@@ -7373,7 +7373,7 @@ object Form1: TForm1
   end
   object PictureRed: TImage
     Left = 680
-    Top = 352
+    Top = 264
     Width = 32
     Height = 32
     Picture.Data = {
@@ -12872,7 +12872,7 @@ object Form1: TForm1
   end
   object PictureGreen: TImage
     Left = 680
-    Top = 264
+    Top = 352
     Width = 32
     Height = 32
     Picture.Data = {
